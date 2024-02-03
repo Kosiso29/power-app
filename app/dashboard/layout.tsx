@@ -5,7 +5,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     return (
         <div>
             <Sidebar />
-            {children}
+            <div className="ml-[length:var(--sidebar-width)] p-10 bg-[#EEF]">
+                {children}
+            </div>
         </div>
     )
 }
