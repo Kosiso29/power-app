@@ -1,8 +1,11 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 // @ts-nocheck
 
 'use client'
 
 import React, { useEffect, useState } from 'react'
+import { LightBulbIcon } from "@heroicons/react/24/outline";
+import Appliance from "../components/appliance";
 
 import dynamic from 'next/dynamic'
 
@@ -91,7 +94,8 @@ export default function Dashboard() {
     const [pieChartSeries, setPieChartSeries] = useState([]);
 
     const calculateAvailablePower = () => {
-        const percentagePower = Math.floor(verticalBarChartSeries[0].data[0] / verticalBarChartSeries[0].data.reduce((x, y) => x + y) * 100);
+        // const percentagePower = Math.floor(verticalBarChartSeries[0].data[0] / verticalBarChartSeries[0].data.reduce((x, y) => x + y) * 100);
+        const percentagePower = Math.floor(Math.random() * 100) + 1;;
         let colors = ['#5a7edc']
         if (percentagePower <= 20) {
             colors = ['#EE5577'];
@@ -105,8 +109,9 @@ export default function Dashboard() {
     useEffect(() => {
         calculateAvailablePower();
     }, [])
+
     return (
-        <div className='h-screen'>
+        <div>
             <h1 className='text-4xl text-primary'>
                 Dashboard
             </h1>
@@ -126,7 +131,16 @@ export default function Dashboard() {
                     <Chart options={barChartOptions} series={barChartSeries} type="bar" width={500} height={250} />
                 </div>
             </div>
-            <div className='bg-white w-full mt-16 h-80 rounded-lg'></div>
+            <div className='bg-white w-full mt-16 h-80 rounded-lg p-12'>
+                <div className='flex justify-evenly text-gray-400 flex-wrap gap-[30%] items-center'>
+                    <Appliance text='Air Condition' initialShow={true} />
+                    <Appliance text='Lights' />
+                    <Appliance text='TV' initialShow={true} />
+                    <Appliance text='AVR' />
+                    <Appliance text='Fridge' initialShow={true} />
+                    <Appliance text='Microwave' />
+                </div>
+            </div>
         </div>
     )
 }
