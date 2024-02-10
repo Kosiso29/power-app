@@ -115,8 +115,8 @@ export default function Dashboard() {
             <h1 className='text-4xl text-primary'>
                 Dashboard
             </h1>
-            <div className="flex justify-between w-full mt-16">
-                <div className='basis-[45%] bg-white rounded-lg p-5'>
+            <div className="flex flex-col xl:flex-row justify-between w-full mt-16 gap-12">
+                <div className='xl:basis-[45%] bg-white rounded-lg p-5'>
                     <h2 className='text-gray-500'>Active Power</h2>
                     <div className="flex justify-between">
                         <div className="flex flex-col items-center">
@@ -126,14 +126,14 @@ export default function Dashboard() {
                         <Chart options={verTicalBarChartOptions} series={verticalBarChartSeries} type="bar" width={200} height={250} />
                     </div>
                 </div>
-                <div className='basis-[45%] bg-white rounded-lg p-5'>
+                <div className='xl:basis-[45%] bg-white rounded-lg p-5'>
                     <h2 className='text-gray-500'>Daily Usage</h2>
                     <Chart options={barChartOptions} series={barChartSeries} type="bar" width={500} height={250} />
                 </div>
             </div>
-            <div className='bg-white w-full mt-16 h-80 rounded-lg p-12'>
+            <div className='bg-white w-full mt-16 rounded-lg p-12'>
                 <div className='flex justify-evenly text-gray-400 flex-wrap gap-[30%] items-center'>
-                    <Appliance text='Air Condition' initialShow={true} />
+                    <Appliance text='A.C' initialShow={true} />
                     <Appliance text='Lights' />
                     <Appliance text='TV' initialShow={true} />
                     <Appliance text='AVR' />
