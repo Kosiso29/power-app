@@ -119,7 +119,7 @@ export default function Dashboard() {
     return (
         <div>
             <h1 className='text-4xl text-primary'>
-                Dashboard
+                Powersync
             </h1>
             <div className="flex flex-col 2lg:flex-row justify-between w-full mt-16 gap-12">
                 <div className='2lg:basis-[45%] bg-white rounded-lg p-5'>
