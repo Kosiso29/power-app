@@ -124,7 +124,7 @@ export default function Dashboard() {
             <div className="flex flex-col 2lg:flex-row justify-between w-full mt-16 gap-12">
                 <div className='2lg:basis-[45%] bg-white rounded-lg p-5'>
                     <h2 className='text-gray-500'>Active Power</h2>
-                    <div className="flex justify-between">
+                    <div className="flex justify-center flex-wrap sm:flex-nowrap sm:justify-between">
                         <div className="flex flex-col items-center">
                             <Chart options={pieChartOptions} series={pieChartSeries} type="radialBar" width={250} height={280} />
                             <span className='mt-[-25px] text-gray-400'>Most Usage</span>
@@ -150,7 +150,7 @@ export default function Dashboard() {
                     <div className='text-gray-500 gap-[30%] border-l-2 border-gray-300 items-center basis-[50%]'>
                         <h1 className='text-xl text-primary pb-8 pl-[10%]'>Insights</h1>
                         <hr className='h-[2px] bg-gray-300 w-[80%] ml-[7%]' />
-                        <ol className='h-60 flex flex-col gap-5 mt-8 px-[10%]'>
+                        <ol className='h-60 flex flex-col gap-5 mt-8 px-7 sm:px-[10%]'>
                             {
                                 insights.map(item => (
                                     <li key={item.insight} className='text-gray-500 list-disc marker:text-primary marker:text-xl py-1'>{ item.insight }</li>
