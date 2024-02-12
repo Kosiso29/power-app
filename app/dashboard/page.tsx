@@ -124,7 +124,7 @@ export default function Dashboard() {
             <div className="flex flex-col 2lg:flex-row justify-between w-full mt-16 gap-12">
                 <div className='2lg:basis-[45%] bg-white rounded-lg p-5'>
                     <h2 className='text-gray-500'>Active Power</h2>
-                    <div className="flex justify-center flex-wrap sm:flex-nowrap sm:justify-between">
+                    <div className="flex justify-center flex-wrap md:flex-nowrap md:justify-between">
                         <div className="flex flex-col items-center">
                             <Chart options={pieChartOptions} series={pieChartSeries} type="radialBar" width={250} height={280} />
                             <span className='mt-[-25px] text-gray-400'>Most Usage</span>
