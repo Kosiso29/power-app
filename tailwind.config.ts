@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import defaultTheme from "tailwindcss/defaultTheme";
 
 const config: Config = {
   content: [
@@ -20,7 +21,11 @@ const config: Config = {
         'primary-active': '#2449aa',
         'secondary': '#FFFFFF'
       }
-    },
+      },
+      screens: {
+          '2lg': '1100px',
+          ...defaultTheme.screens
+      }
   },
   plugins: [],
 };
