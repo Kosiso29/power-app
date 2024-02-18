@@ -5,7 +5,8 @@ import { useState, useEffect } from 'react';
 
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
-export default function PieChart() {
+export default function PieChart({ availablePower }) {
+    const [pieChartAvailablePower, setPieChartAvailablePower] = useState([availablePower])
 
     const [pieChartOptions, setPieChartOptions] = useState({
         chart: {
@@ -24,23 +25,25 @@ export default function PieChart() {
 
     const [pieChartSeries, setPieChartSeries] = useState([]);
 
-    const calculateAvailablePower = () => {
-        // const percentagePower = Math.floor(verticalBarChartSeries[0].data[0] / verticalBarChartSeries[0].data.reduce((x, y) => x + y) * 100);
-        const percentagePower = Math.floor(Math.random() * 100) + 1;;
+    const updatePieChart = () => {
         let colors = ['#5a7edc']
-        if (percentagePower <= 20) {
+        if (pieChartAvailablePower <= 20) {
             colors = ['#EE5577'];
         }
         setPieChartOptions({
             ...pieChartOptions,
             colors,
         })
-        setPieChartSeries([percentagePower]);
+        setPieChartSeries([pieChartAvailablePower]);
     }
 
     useEffect(() => {
-        calculateAvailablePower();
-    }, [])
+        setPieChartAvailablePower(availablePower);
+    }, [availablePower]);
+
+    useEffect(() => {
+        updatePieChart();
+    }, [pieChartAvailablePower])
 
     return (
         <Chart options={pieChartOptions} series={pieChartSeries} type="radialBar" width={250} height={280} />

@@ -16,6 +16,7 @@ export default function Dashboard() {
     const [recommendedActions, setRecommendedActions] = useState([]);
     const [switchesToTurnOff, setSwitchesToTurnOff] = useState([]);
     const [totalPowerBySwitches, setTotalPowerBySwitches] = useState([]);
+    const [availablePower, setAvailablePower] = useState([]);
     const getData = async () => {
         await new Promise((resolve, reject) => {
             axios.get('https://haargkjp4icg6n32efofw4yuom0qgbvd.lambda-url.eu-west-3.on.aws/')
@@ -25,6 +26,7 @@ export default function Dashboard() {
                     setRecommendedActions(data.insights.recommended_actions);
                     setSwitchesToTurnOff(data.insights.switches_to_turn_off);
                     setTotalPowerBySwitches(data.total_power_by_switches);
+                    setAvailablePower(Math.floor((data.total_power_after_last_month / data.total_power_purchased) * 100));
                     resolve();
                 })
                 .catch(() => reject());
@@ -45,7 +47,7 @@ export default function Dashboard() {
                     <h2 className='text-gray-500'>Active Power</h2>
                     <div className="flex justify-center flex-wrap md:flex-nowrap md:justify-between">
                         <div className="flex flex-col items-center">
-                            <PieChart />
+                            <PieChart availablePower={availablePower} />
                             <span className='mt-[-25px] text-gray-400'>Most Usage</span>
                         </div>
                         <VerticalBarChart totalPowerBySwitches={totalPowerBySwitches} />
