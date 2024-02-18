@@ -3,12 +3,13 @@
 
 'use client'
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { LightBulbIcon } from "@heroicons/react/24/outline";
 import Appliance from "../components/appliance";
 import VerticalBarChart from "../components/vertical-bar-chart";
 import PieChart from "../components/pie-chart";
 import BarChart from "../components/bar-chart";
+import axios from "axios";
 
 const insights = [
     { insight: "Consider turning off the bedroom fan" },
@@ -17,6 +18,21 @@ const insights = [
 ]
 
 export default function Dashboard() {
+    const [dailyConsumption, setDailyConsumption] = useState({});
+    const getData = async () => {
+        await new Promise((resolve, reject) => {
+            axios.get('https://haargkjp4icg6n32efofw4yuom0qgbvd.lambda-url.eu-west-3.on.aws/')
+                .then(response => {
+                    setDailyConsumption(response.data.daily_consumption);
+                    resolve();
+                })
+                .catch(() => reject());
+        })
+    }
+
+    useEffect(() => {
+        getData();
+    }, []);
 
     return (
         <div>
@@ -36,7 +52,7 @@ export default function Dashboard() {
                 </div>
                 <div className='2lg:basis-[45%] bg-white rounded-lg p-5'>
                     <h2 className='text-gray-500'>Daily Usage</h2>
-                    <BarChart />
+                    <BarChart daily_consumption={dailyConsumption} />
                 </div>
             </div>
             <div className='bg-white w-full mt-16 rounded-lg md:p-12 py-12 px-2 h-auto'>
