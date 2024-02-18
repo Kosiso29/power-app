@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 // @ts-nocheck
 
 import dynamic from 'next/dynamic'
@@ -53,7 +52,9 @@ export default function VerticalBarChart({ totalPowerBySwitches }) {
         const sortedTotalPowerBySwitches = Object.entries(totalPowerBySwitches).sort(([, a], [, b]) => b - a);
         setSortedSwitches(sortedTotalPowerBySwitches.map(switchPowerArray => switchPowerArray[0]));
         setSortedPower(sortedTotalPowerBySwitches.map(switchPowerArray => switchPowerArray[1]));
+    }, [totalPowerBySwitches]);
 
+    useEffect(() => {
         setVerticalBarChartOptions(prevState => {
             return {
                 ...prevState,
@@ -71,7 +72,7 @@ export default function VerticalBarChart({ totalPowerBySwitches }) {
                 data: sortedPower,
             }]
         });
-    }, [totalPowerBySwitches] )
+    }, [sortedPower, sortedSwitches])
 
     return (
         <Chart options={verticalBarChartOptions} series={verticalBarChartSeries} type="bar" width={200} height={250} />

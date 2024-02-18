@@ -41,7 +41,7 @@ export default function Dashboard() {
                 Powersync
             </h1>
             <div className="flex flex-col 2lg:flex-row justify-between w-full mt-16 gap-12">
-                <div className='2lg:basis-[45%] bg-white rounded-lg p-5'>
+                <div className='2lg:basis-[45%] bg-white rounded-lg p-5 min-h-48'>
                     <h2 className='text-gray-500'>Active Power</h2>
                     <div className="flex justify-center flex-wrap md:flex-nowrap md:justify-between">
                         <div className="flex flex-col items-center">
@@ -51,7 +51,7 @@ export default function Dashboard() {
                         <VerticalBarChart totalPowerBySwitches={totalPowerBySwitches} />
                     </div>
                 </div>
-                <div className='2lg:basis-[45%] bg-white rounded-lg p-5'>
+                <div className='2lg:basis-[45%] bg-white rounded-lg p-5 min-h-48'>
                     <h2 className='text-gray-500'>Daily Usage</h2>
                     <BarChart dailyConsumption={dailyConsumption} />
                 </div>
