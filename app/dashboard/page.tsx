@@ -11,19 +11,20 @@ import PieChart from "../components/pie-chart";
 import BarChart from "../components/bar-chart";
 import axios from "axios";
 
-const insights = [
-    { insight: "Consider turning off the bedroom fan" },
-    { insight: "Schedule a time to regulate your A.C" },
-    { insight: "Reduce usage of the microwave" }
-]
-
 export default function Dashboard() {
     const [dailyConsumption, setDailyConsumption] = useState({});
+    const [recommendedActions, setRecommendedActions] = useState([]);
+    const [switchesToTurnOff, setSwitchesToTurnOff] = useState([]);
+    const [totalPowerBySwitches, setTotalPowerBySwitches] = useState([]);
     const getData = async () => {
         await new Promise((resolve, reject) => {
             axios.get('https://haargkjp4icg6n32efofw4yuom0qgbvd.lambda-url.eu-west-3.on.aws/')
-                .then(response => {
-                    setDailyConsumption(response.data.daily_consumption);
+                .then(response => response.data)
+                .then(data => {
+                    setDailyConsumption(data.daily_consumption);
+                    setRecommendedActions(data.insights.recommended_actions);
+                    setSwitchesToTurnOff(data.insights.switches_to_turn_off);
+                    setTotalPowerBySwitches(data.total_power_by_switches);
                     resolve();
                 })
                 .catch(() => reject());
@@ -47,31 +48,37 @@ export default function Dashboard() {
                             <PieChart />
                             <span className='mt-[-25px] text-gray-400'>Most Usage</span>
                         </div>
-                        <VerticalBarChart />
+                        <VerticalBarChart totalPowerBySwitches={totalPowerBySwitches} />
                     </div>
                 </div>
                 <div className='2lg:basis-[45%] bg-white rounded-lg p-5'>
                     <h2 className='text-gray-500'>Daily Usage</h2>
-                    <BarChart daily_consumption={dailyConsumption} />
+                    <BarChart dailyConsumption={dailyConsumption} />
                 </div>
             </div>
             <div className='bg-white w-full mt-16 rounded-lg md:p-12 py-12 px-2 h-auto'>
                 <div className="flex justify-between h-auto">
-                    <div className='flex justify-evenly text-gray-400 flex-wrap gap-[30%] basis-[50%] items-center pr-[5%]'>
-                        <Appliance text='A.C' initialShow={true} />
-                        <Appliance text='Lights' />
-                        <Appliance text='TV' initialShow={true} />
-                        <Appliance text='AVR' />
-                        <Appliance text='Fridge' initialShow={true} />
-                        <Appliance text='Microwave' />
+                    <div className='flex justify-evenly text-gray-400 flex-wrap gap-[10%] basis-[50%] items-center pr-[5%]'>
+                        {
+                            Object.keys(totalPowerBySwitches).map((item, index) => (
+                                <Appliance key={item} text={item} initialShow={index%2 ? false : true} />
+                            ))
+                        }
                     </div>
                     <div className='text-gray-500 gap-[30%] border-l-2 border-gray-300 items-center basis-[50%]'>
                         <h1 className='text-xl text-primary pb-8 pl-[10%]'>Insights</h1>
                         <hr className='h-[2px] bg-gray-300 w-[80%] ml-[7%]' />
-                        <ul className='h-60 flex flex-col gap-5 mt-8 px-7 sm:px-[10%]'>
+                        <div className="flex flex-wrap text-gray-400 gap-2 pl-[14%] mt-5">
                             {
-                                insights.map(item => (
-                                    <li key={item.insight} className='text-gray-500 list-disc marker:text-primary marker:text-xl py-1'>{ item.insight }</li>
+                                switchesToTurnOff.map(item => (
+                                    <Appliance key={item} text={item} initialShow={true} />
+                                ))
+                            }
+                        </div>
+                        <ul className='h-60 flex flex-col gap-5 px-7 sm:px-[10%]'>
+                            {
+                                recommendedActions.map(item => (
+                                    <li key={item} className='text-gray-500 list-disc marker:text-primary marker:text-xl py-1'>{ item }</li>
                                 ))
                             }
                         </ul>

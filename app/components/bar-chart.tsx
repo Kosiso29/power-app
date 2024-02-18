@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
-export default function BarChart({ daily_consumption = {} }) {
+export default function BarChart({ dailyConsumption = {} }) {
     const [barChartOptions, setBarChartOptions] = useState({
         chart: {
             id: 'BarChart',
@@ -14,7 +14,7 @@ export default function BarChart({ daily_consumption = {} }) {
             foreColor: '#AAAAAA'
         },
         xaxis: {
-            categories: Object.keys(daily_consumption)
+            categories: Object.keys(dailyConsumption)
         },
         fill: {
             type: 'gradient',
@@ -26,7 +26,7 @@ export default function BarChart({ daily_consumption = {} }) {
     })
     const [barChartSeries, setBarChartSeries] = useState([{
         name: 'series-1',
-        data: Object.values(daily_consumption),
+        data: Object.values(dailyConsumption),
         color: '#5a7edc'
     }]);
     
@@ -35,17 +35,17 @@ export default function BarChart({ daily_consumption = {} }) {
             return {
                 ...prevState,
                 xaxis: {
-                    categories: Object.keys(daily_consumption)
+                    categories: Object.keys(dailyConsumption)
                 }
             }
         });
         setBarChartSeries(prevState => {
             return [{
                 ...prevState[0],
-                data: Object.values(daily_consumption),
+                data: Object.values(dailyConsumption),
             }]
         })
-    }, [daily_consumption]);
+    }, [dailyConsumption]);
 
     return (
         <Chart options={barChartOptions} series={barChartSeries} type="bar" width={"100%"} height={"auto"} />

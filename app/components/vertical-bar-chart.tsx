@@ -1,12 +1,16 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+// @ts-nocheck
 
 import dynamic from 'next/dynamic'
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
-export default function VerticalBarChart() {
+export default function VerticalBarChart({ totalPowerBySwitches }) {
+    const [sortedPower, setSortedPower] = useState([]);
+    const [sortedSwitches, setSortedSwitches] = useState([]);
 
-    const [verTicalBarChartOptions] = useState({
+    const [verticalBarChartOptions, setVerticalBarChartOptions] = useState({
         chart: {
             id: 'VerticalBarChart',
             toolbar: {
@@ -26,7 +30,7 @@ export default function VerticalBarChart() {
             }
         },
         xaxis: {
-            categories: ['Air Condition', 'Lights', 'TV', 'AVR', 'Fridge', 'Microwave', 'Others'],
+            categories: sortedSwitches,
             labels: {
                 show: false
             }
@@ -39,13 +43,37 @@ export default function VerticalBarChart() {
             }
         }
     })
-    const [verticalBarChartSeries] = useState([{
+    const [verticalBarChartSeries, setVerticalBarChartSeries] = useState([{
         name: 'series-1',
-        data: [125, 91, 70, 60, 49, 50, 35],
+        data: sortedPower,
         color: '#5a7edc'
     }])
 
+    useEffect(() => {
+        const sortedTotalPowerBySwitches = Object.entries(totalPowerBySwitches).sort(([, a], [, b]) => b - a);
+        setSortedSwitches(sortedTotalPowerBySwitches.map(switchPowerArray => switchPowerArray[0]));
+        setSortedPower(sortedTotalPowerBySwitches.map(switchPowerArray => switchPowerArray[1]));
+
+        setVerticalBarChartOptions(prevState => {
+            return {
+                ...prevState,
+                xaxis: {
+                    categories: sortedSwitches,
+                    labels: {
+                        show: false
+                    }
+                },
+            }
+        });
+        setVerticalBarChartSeries(prevState => {
+            return [{
+                ...prevState[0],
+                data: sortedPower,
+            }]
+        });
+    }, [totalPowerBySwitches] )
+
     return (
-        <Chart options={verTicalBarChartOptions} series={verticalBarChartSeries} type="bar" width={200} height={250} />
+        <Chart options={verticalBarChartOptions} series={verticalBarChartSeries} type="bar" width={200} height={250} />
     )
 }
