@@ -19,7 +19,7 @@ const schedules = [
         image_url: '/customers/evil-rabbit.png'
     },
     {
-        id: 'e200643f-9d62-4b38-9f22-eaadcdd96aac',
+        id: 'e200643f',
         amount: 2023,
         date: 2023,
         status: 'inactive',
@@ -29,7 +29,7 @@ const schedules = [
         image_url: '/customers/evil-rabbit.png'
     },
     {
-        id: 'e200643f-9d62-4b38-9f22-eaadcdd96aac',
+        id: 'e200643f-9d62',
         amount: 2023,
         date: 2023,
         status: 'inactive',
@@ -39,7 +39,7 @@ const schedules = [
         image_url: '/customers/evil-rabbit.png'
     },
     {
-        id: 'e200643f-9d62-4b38-9f22-eaadcdd96aac',
+        id: 'e200643f-9d62-4b38',
         amount: 2023,
         date: 2023,
         status: 'active',
@@ -49,7 +49,7 @@ const schedules = [
         image_url: '/customers/evil-rabbit.png'
     },
     {
-        id: 'e200643f-9d62-4b38-9f22-eaadcdd96aac',
+        id: 'e200643f-9d62-4b38-9f22',
         amount: 2023,
         date: 2023,
         status: 'active',
@@ -59,7 +59,7 @@ const schedules = [
         image_url: '/customers/evil-rabbit.png'
     },
     {
-        id: 'e200643f-9d62-4b38-9f22-eaadcdd96aac',
+        id: '9d62-4b38-9f22-eaadcdd96aac',
         amount: 2023,
         date: 2023,
         status: 'active',
