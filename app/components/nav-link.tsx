@@ -13,7 +13,7 @@ export default function NavLink({ href, children }: { href: string, children: Re
             className={clsx(
                 "text-white rounded-md hover:bg-primary-hover flex flex-col justify-between items-center h-16 w-20 gap-1 p-3 text-xs",
                 {
-                    "bg-primary-active": pathname === href
+                    "bg-primary-active": pathname === href || pathname === href + "/create"
                 }
             )}
         >
