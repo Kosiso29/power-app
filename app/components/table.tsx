@@ -6,6 +6,7 @@ import {
 } from '@heroicons/react/24/outline';
 import Link from "next/link";
 import Appliance from "./appliance";
+import Loading from "../ui/loading";
 
 const daysMap = {
     "Monday": "M",
@@ -156,6 +157,11 @@ export default function Table({ schedules }) {
                             ))}
                         </tbody>
                     </table>
+                </div>
+                <div className='mt-8'>
+                    {
+                        schedules.length === 0 && <Loading />
+                    }
                 </div>
             </div>
         </div>
