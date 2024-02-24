@@ -1,17 +1,21 @@
 // @ts-nocheck
 
 import {
-    CheckIcon,
-    ClockIcon,
-    UserCircleIcon,
-    CalendarIcon,
-    XMarkIcon,
-    ArrowPathRoundedSquareIcon,
-    ArrowUturnDownIcon,
     PencilIcon,
     TrashIcon
 } from '@heroicons/react/24/outline';
 import Link from "next/link";
+import Appliance from "./appliance";
+
+const daysMap = {
+    "Monday": "M",
+    "Tuesday": "T",
+    "Wednesday": "W",
+    "Thursday": "T",
+    "Friday": "F",
+    "Saturday": "S",
+    "Sunday": "S"
+}
 
 export default function Table({ schedules }) {
     return (
@@ -19,37 +23,37 @@ export default function Table({ schedules }) {
             <div className="inline-block min-w-full align-middle">
                 <div className="rounded-lg bg-gray-100 p-2 pt-0">
                     {/* <div className="md:hidden">
-                    {schedules?.map((invoice) => (
+                    {schedules?.map((schedule) => (
                         <div
-                            key={invoice.id}
+                            key={schedule.id}
                             className="mb-2 w-full rounded-md bg-white p-4"
                         >
                             <div className="flex items-center justify-between border-b pb-4">
                                 <div>
                                     <div className="mb-2 flex items-center">
                                         <Image
-                                            src={invoice.image_url}
+                                            src={schedule.image_url}
                                             className="mr-2 rounded-full"
                                             width={28}
                                             height={28}
-                                            alt={`${invoice.name}'s profile picture`}
+                                            alt={`${schedule.name}'s profile picture`}
                                         />
-                                        <p>{invoice.name}</p>
+                                        <p>{schedule.name}</p>
                                     </div>
-                                    <p className="text-sm text-gray-500">{invoice.email}</p>
+                                    <p className="text-sm text-gray-500">{schedule.email}</p>
                                 </div>
-                                <InvoiceStatus status={invoice.status} />
+                                <InvoiceStatus status={schedule.status} />
                             </div>
                             <div className="flex w-full items-center justify-between pt-4">
                                 <div>
                                     <p className="text-xl font-medium">
-                                        {formatCurrency(invoice.amount)}
+                                        {formatCurrency(schedule.amount)}
                                     </p>
-                                    <p>{formatDateToLocal(invoice.date)}</p>
+                                    <p>{formatDateToLocal(schedule.date)}</p>
                                 </div>
                                 <div className="flex justify-end gap-2">
-                                    <UpdateInvoice id={invoice.id} />
-                                    <DeleteInvoice id={invoice.id} />
+                                    <UpdateInvoice id={schedule.id} />
+                                    <DeleteInvoice id={schedule.id} />
                                 </div>
                             </div>
                         </div>
@@ -59,22 +63,25 @@ export default function Table({ schedules }) {
                         <thead className="rounded-lg text-left text-sm font-normal">
                             <tr>
                                 <th scope="col" className="px-4 py-5 font-medium sm:pl-6">
-                                    Schedule Type
-                                </th>
-                                <th scope="col" className="px-3 py-5 font-medium">
                                     Schedule name
                                 </th>
                                 <th scope="col" className="px-3 py-5 font-medium">
-                                    Start time
+                                    Schedule type
                                 </th>
                                 <th scope="col" className="px-3 py-5 font-medium">
-                                    End time
+                                    Switches
+                                </th>
+                                <th scope="col" className="px-3 py-5 font-medium">
+                                    Start time / date
+                                </th>
+                                <th scope="col" className="px-3 py-5 font-medium">
+                                    End time / date
                                 </th>
                                 <th scope="col" className="px-3 py-5 font-medium">
                                     Status
                                 </th>
                                 <th scope="col" className="px-3 py-5 font-medium">
-                                    Frequency
+                                    Days
                                 </th>
                                 <th scope="col" className="relative py-3 pl-6 pr-3">
                                     <span className="sr-only">Edit</span>
@@ -82,63 +89,52 @@ export default function Table({ schedules }) {
                             </tr>
                         </thead>
                         <tbody className="bg-white">
-                            {schedules?.map((invoice) => (
+                            {schedules.length > 0 && schedules?.map((schedule) => (
                                 <tr
-                                    key={invoice.id}
+                                    key={schedule.id}
                                     className="w-full border-b py-3 text-sm last-of-type:border-none [&:first-child>td:first-child]:rounded-tl-lg [&:first-child>td:last-child]:rounded-tr-lg [&:last-child>td:first-child]:rounded-bl-lg [&:last-child>td:last-child]:rounded-br-lg"
                                 >
                                     <td className="whitespace-nowrap py-3 pl-6 pr-3">
-                                        <div className="flex items-center gap-3">
-                                            {/* <Image
-                                            src={invoice.image_url}
-                                            className="rounded-full"
-                                            width={28}
-                                            height={28}
-                                            alt={`${invoice.name}'s profile picture`}
-                                        /> */}
-                                            <p>{invoice.name}</p>
+                                        <div className="flex items-center gap-2">
+                                            <Appliance size={15} defaultShow={schedule.effect === "on"} className='p-1 cursor-default' /> <span>{schedule.schedule_name}</span>
                                         </div>
                                     </td>
                                     <td className="whitespace-nowrap px-3 py-3">
-                                        {invoice.email}
+                                        {schedule.schedule_type}
                                     </td>
                                     <td className="whitespace-nowrap px-3 py-3">
-                                        {invoice.amount}
+                                        {schedule.switches.toString().replace(/[|]/g, "")}
                                     </td>
-                                    <td className="whitespace-nowrap px-3 py-3">
-                                        {invoice.date}
+                                    <td className="px-3 py-3">
+                                        {schedule.from} / {schedule.start_date}
                                     </td>
-                                    <td className="whitespace-nowrap px-3 py-3">
-                                        {
-                                            invoice.status === 'active' ?
-                                                <span
-                                                    className="w-fit flex cursor-pointer items-center gap-1.5 rounded-full bg-green-500 px-3 py-1.5 text-xs font-medium text-white"
-                                                >
-                                                    {invoice.status} <CheckIcon className="h-4 w-4" />
-                                                </span> :
-                                                <span
-                                                    className="w-fit flex cursor-pointer items-center gap-1.5 rounded-full bg-red-500 px-3 py-1.5 text-xs font-medium text-white"
-                                                >
-                                                    {invoice.status} <XMarkIcon className="h-4 w-4" />
-                                                </span>
-                                        }
-                                        {/* <InvoiceStatus status={invoice.status} /> */}
+                                    <td className="px-3 py-3">
+                                        {schedule.to} / {schedule.end_date}
                                     </td>
                                     <td className="whitespace-nowrap px-3 py-3">
                                         {
-                                            invoice.frequency === 'one time' ?
+                                            schedule.status === 'active' ?
                                                 <span
-                                                    className="w-fit flex cursor-pointer items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1.5 text-xs font-medium text-black"
+                                                    className="w-fit flex cursor-pointer items-center gap-1.5 rounded-full bg-primary px-3 py-1.5 text-xs font-medium text-white"
                                                 >
-                                                    {invoice.frequency} <ArrowUturnDownIcon className="h-4 w-4" />
+                                                    {schedule.status}
                                                 </span> :
                                                 <span
                                                     className="w-fit flex cursor-pointer items-center gap-1.5 rounded-full bg-gray-400 px-3 py-1.5 text-xs font-medium text-white"
                                                 >
-                                                    {invoice.frequency} <ArrowPathRoundedSquareIcon className="h-4 w-4" />
+                                                    {schedule.status}
                                                 </span>
                                         }
-                                        {/* <InvoiceStatus status={invoice.status} /> */}
+                                    </td>
+                                    <td className="whitespace-nowrap px-3 py-3">
+                                        {
+                                            Object.entries(daysMap).map((entry, index) => {
+                                                if (schedule.days.includes(entry[0])) {
+                                                    return <span key={entry[1] + index} className='mr-1 text-primary'>{entry[1]}</span>
+                                                }
+                                                return <span key={entry[1] + index} className='mr-1 text-gray-400'>{entry[1]}</span>
+                                            })
+                                        }
                                     </td>
                                     <td className="whitespace-nowrap py-3 pl-6 pr-3">
                                         <div className="flex justify-end gap-3">
@@ -154,8 +150,6 @@ export default function Table({ schedules }) {
                                             >
                                                 <TrashIcon className="w-5" />
                                             </Link>
-                                            {/* <UpdateInvoice id={invoice.id} />
-                                        <DeleteInvoice id={invoice.id} /> */}
                                         </div>
                                     </td>
                                 </tr>

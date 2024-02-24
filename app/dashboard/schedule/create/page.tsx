@@ -125,7 +125,7 @@ export default function Form() {
                                         />
                                         <label
                                             htmlFor="pending"
-                                            className="ml-2 flex cursor-pointer items-center gap-1.5 rounded-full bg-red-500 px-3 py-1.5 text-xs font-medium text-white"
+                                            className="ml-2 flex cursor-pointer items-center gap-1.5 rounded-full bg-gray-400 px-3 py-1.5 text-xs font-medium text-white"
                                         >
                                             inactive <XMarkIcon className="h-4 w-4" />
                                         </label>
@@ -141,7 +141,7 @@ export default function Form() {
                                         />
                                         <label
                                             htmlFor="paid"
-                                            className="ml-2 flex cursor-pointer items-center gap-1.5 rounded-full bg-green-500 px-3 py-1.5 text-xs font-medium text-white"
+                                            className="ml-2 flex cursor-pointer items-center gap-1.5 rounded-full bg-primary px-3 py-1.5 text-xs font-medium text-white"
                                         >
                                             active <CheckIcon className="h-4 w-4" />
                                         </label>
@@ -151,7 +151,7 @@ export default function Form() {
                         </fieldset>
 
                         {/* Invoice Status */}
-                        <fieldset>
+                        {/* <fieldset>
                             <legend className="mb-2 block text-sm font-medium">
                                 Set frequency
                             </legend>
@@ -191,7 +191,7 @@ export default function Form() {
                                     </div>
                                 </div>
                             </div>
-                        </fieldset>
+                        </fieldset> */}
                     </div>
                     <div className="mt-6 flex justify-end gap-4">
                         <Link
