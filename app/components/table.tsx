@@ -131,7 +131,7 @@ export default function Table({ schedules }) {
                                         {
                                             Object.entries(daysMap).map((entry, index) => {
                                                 if (schedule.days.includes(entry[0])) {
-                                                    return <span key={entry[1] + index} className='mr-1 text-primary'>{entry[1]}</span>
+                                                    return <span key={entry[1] + index} className='mr-1 text-primary font-bold'>{entry[1]}</span>
                                                 }
                                                 return <span key={entry[1] + index} className='mr-1 text-gray-400'>{entry[1]}</span>
                                             })
