@@ -106,7 +106,7 @@ export default function Schedule() {
                 <PlusIcon className="h-5 md:ml-4" />
                 </Link>
             </div>
-            <div className='bg-white w-full mt-8 rounded-lg md:p-8 py-8 px-2 h-auto overflow-scroll'>
+            <div className='bg-white w-full mt-8 rounded-lg md:p-8 py-8 px-2 h-auto'>
                 <Table schedules={schedules} />
             </div>
         </div>
