@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { LightBulbIcon } from "@heroicons/react/24/outline";
 
-export default function Appliance({ initialShow = false, text, size = 40, defaultShow, className }: { initialShow?: boolean, text: string, size?: string | number, defaultShow?: boolean, className: string }) {
+export default function Appliance({ initialShow = false, text, size = 40, defaultShow, className }: { initialShow?: boolean, text: string, size?: string | number, defaultShow?: boolean, className?: string }) {
     const [show, setShow] = useState(initialShow);
 
     const handleClick = () => {

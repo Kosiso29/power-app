@@ -11,7 +11,7 @@ export default function NavLink({ href, children }: { href: string, children: Re
         <Link
             href={href}
             className={clsx(
-                "text-white rounded-md hover:bg-primary-hover flex flex-col justify-between items-center h-16 w-20 gap-1 p-3 text-xs",
+                "text-white rounded-md hover:bg-primary-hover flex flex-col justify-between items-center h-16 w-20 gap-1 p-3 text-[.7rem]",
                 {
                     "bg-primary-active": pathname === href || pathname === href + "/create"
                 }
