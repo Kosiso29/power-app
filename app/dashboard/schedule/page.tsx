@@ -17,10 +17,10 @@ export default function Schedule() {
 
     const getData = async () => {
         await new Promise((resolve, reject) => {
-            axios.get('https://lngupzkavsgkbbrqvnmbc4prxa0shinh.lambda-url.eu-west-3.on.aws/')
+            axios.get('https://4u515dnude.execute-api.eu-west-3.amazonaws.com/dev')
                 .then(response => response.data)
                 .then(data => {
-                    setSchedules(data.schedules);
+                    setSchedules(data);
                     resolve();
                 })
                 .catch(() => reject());
@@ -28,7 +28,6 @@ export default function Schedule() {
     }
     useEffect(() => {
         dispatch(schedulesActions.updateSchedules(schedules));
-        console.log('schedules', schedules);
     }, [schedules, dispatch])
 
     useEffect(() => {

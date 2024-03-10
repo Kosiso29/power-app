@@ -10,17 +10,36 @@ import {
     ArrowPathRoundedSquareIcon,
     ArrowUturnDownIcon
 } from '@heroicons/react/24/outline';
-import { useSelector } from "react-redux";
-import Appliance from "@/app/components/appliance";
+import axios from "axios";
 
 const switches = ['SW1', 'SW2', 'SW3', 'SW4']
 
 const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
 export default function Form() {
-    const schedules = useSelector((state: any) => state.schedulesReducer.schedules);
 
-    const getFormData = (formData: any) => {
+    const postData = async (apiData: any) => {
+        const options = {
+            url: 'https://4u515dnude.execute-api.eu-west-3.amazonaws.com/dev',
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json;charset=UTF-8',
+                'Access-Control-Allow-Origin': '*'
+            },
+            data: apiData
+        };
+        await new Promise((resolve, reject) => {
+            axios(options)
+                .then(response => {
+                    alert(response);
+                    resolve(response);
+                })
+                .catch(() => reject());
+        })
+    }
+
+    const getFormData = async (formData: any) => {
         console.log('formData', formData.get('customerId'), formData.get('switches'), formData.entries());
         const formDataObject: any = {};
 
@@ -35,12 +54,17 @@ export default function Form() {
         const apiData = {
             ...formDataObject,
             switches,
-            days
+            days,
+            period: ""
         }
 
         // const { schedule_type, schedule_name } = formDataObject;
 
-        console.log('form entries', formDataObject, formData.getAll('switches'), formData.getAll('days'));
+        console.log('form entries', apiData);
+
+        await postData(apiData);
+
+        console.log('done');
     }
 
     return (
