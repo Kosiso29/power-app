@@ -19,23 +19,15 @@ const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'
 export default function Form() {
 
     const postData = async (apiData: any) => {
-        const options = {
-            url: 'https://4u515dnude.execute-api.eu-west-3.amazonaws.com/dev',
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json;charset=UTF-8',
-                'Access-Control-Allow-Origin': '*'
-            },
-            data: apiData
-        };
         await new Promise((resolve, reject) => {
-            axios(options)
+            axios.post('https://5jl4i1e6j7.execute-api.eu-west-3.amazonaws.com/dev', { ...apiData })
                 .then(response => {
                     alert(response);
                     resolve(response);
                 })
-                .catch(() => reject());
+                .catch((error) => {
+                    reject(error);
+                });
         })
     }
 
@@ -55,7 +47,10 @@ export default function Form() {
             ...formDataObject,
             switches,
             days,
-            period: ""
+            'period(hr)': 14,
+            device_id: "12a34b56c78d9",
+            from: 1200,
+            to: 2000
         }
 
         // const { schedule_type, schedule_name } = formDataObject;

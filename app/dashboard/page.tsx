@@ -63,7 +63,7 @@ export default function Dashboard() {
                     <div className='flex justify-evenly text-gray-400 flex-wrap gap-[10%] basis-[50%] items-center pr-[5%]'>
                         {
                             Object.keys(totalPowerBySwitches).map((item, index) => (
-                                <Appliance key={item} text={item} initialShow={index%2 ? false : true} />
+                                <Appliance key={item} text={item} initialShow={index % 2 ? false : true} />
                             ))
                         }
                     </div>
@@ -80,7 +80,7 @@ export default function Dashboard() {
                         <ul className='h-60 flex flex-col gap-5 px-7 sm:px-[10%]'>
                             {
                                 recommendedActions.map(item => (
-                                    <li key={item} className='text-gray-500 list-disc marker:text-primary marker:text-xl py-1'>{ item }</li>
+                                    <li key={item} className='text-gray-500 list-disc marker:text-primary marker:text-xl py-1'>{item}</li>
                                 ))
                             }
                         </ul>
