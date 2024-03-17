@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from "react";
 import Link from 'next/link';
 import {
     CheckIcon,
@@ -10,29 +11,36 @@ import {
     ArrowPathRoundedSquareIcon,
     ArrowUturnDownIcon
 } from '@heroicons/react/24/outline';
+import { ToastContainer, toast } from 'react-toastify';
+import Loading from "@/app/components/loading";
 import axios from "axios";
+import 'react-toastify/dist/ReactToastify.css';
 
 const switches = ['SW1', 'SW2', 'SW3', 'SW4']
 
 const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
 export default function Form() {
+    const [loading, setLoading] = useState(false);
 
     const postData = async (apiData: any) => {
         await new Promise((resolve, reject) => {
             axios.post('https://5jl4i1e6j7.execute-api.eu-west-3.amazonaws.com/dev', { ...apiData })
                 .then(response => {
-                    alert(response);
+                    setLoading(false);
+                    console.log('schedule Id', response.data);
+                    toast.success('Schedule created');
                     resolve(response);
                 })
+                .then(() => window.location.href = "/dashboard/schedule")
                 .catch((error) => {
-                    reject(error);
+                    setLoading(false);
+                    toast.error(`There was an error: ${error?.response?.data || error?.response || error}`)
                 });
         })
     }
 
     const getFormData = async (formData: any) => {
-        console.log('formData', formData.get('customerId'), formData.get('switches'), formData.entries());
         const formDataObject: any = {};
 
         formData.forEach((value: any, key: any) => {
@@ -47,19 +55,15 @@ export default function Form() {
             ...formDataObject,
             switches,
             days,
-            'period(hr)': 14,
+            effect: formDataObject.effect || 'off',
             device_id: "12a34b56c78d9",
-            from: 1200,
-            to: 2000
+            from: Number(formDataObject.from.replace(':', '')),
+            to: Number(formDataObject.to.replace(':', ''))
         }
 
-        // const { schedule_type, schedule_name } = formDataObject;
-
-        console.log('form entries', apiData);
+        console.log('apiData', apiData);
 
         await postData(apiData);
-
-        console.log('done');
     }
 
     return (
@@ -327,12 +331,17 @@ export default function Form() {
                         </Link>
                         <button
                             className="flex h-10 items-center rounded-lg bg-blue-600 px-4 text-sm font-medium text-white transition-colors hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+                            onClick={() => setLoading(true)}
                         >
                             <span className="hidden md:block">Create Schedule</span>
                         </button>
+                        {
+                            loading ? <div className='self-center'><Loading small /></div> : null
+                        }
                     </div>
                 </form>
             </div>
+            <ToastContainer autoClose={3500} position="top-right" />
         </div>
     );
 }
