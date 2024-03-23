@@ -1,12 +1,19 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 // @ts-nocheck
+'use client'
 
+import axios from "axios";
 import {
     PencilIcon,
     TrashIcon
 } from '@heroicons/react/24/outline';
 import Link from "next/link";
 import Appliance from "./appliance";
-import Loading from "../ui/loading";
+import Loading from "@/app/components/loading";
+import YesNo from "./yesno";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { useState, useEffect } from 'react';
 
 const daysMap = {
     "Monday": "M",
@@ -19,6 +26,44 @@ const daysMap = {
 }
 
 export default function Table({ schedules }) {
+    const [loading, setLoading] = useState(false);
+    const [answer, setAnswer] = useState("");
+    const [deleteId, setDeleteId] = useState("");
+
+    const handleDelete = (id) => {
+        setDeleteId(id);
+    }
+
+    const postData = async () => {
+        await new Promise((resolve) => {
+            axios.delete(`https://5jl4i1e6j7.execute-api.eu-west-3.amazonaws.com/dev/12a34b56c78d9?sort_key=${deleteId}`)
+                .then(response => {
+                    setDeleteId("");
+                    setLoading(false);
+                    setAnswer("");
+                    toast.success('Schedule deleted');
+                    console.log('response', response?.data)
+                    resolve(response);
+                })
+                .then(() => window.location.reload())
+                .catch((error) => {
+                    setLoading(false);
+                    toast.error(`Schedule failed to delete: ${error?.response?.data || error?.response || error}`);
+                });
+        })
+    }
+
+    useEffect(() => {
+        if (answer === "yes") {
+            setLoading(true);
+            postData();
+        }
+        if (answer === "no") {
+            setAnswer("");
+            setDeleteId("");
+        }
+    }, [answer, deleteId])
+
     return (
         <div className="flow-root max-w-full">
             <div className="inline-block min-w-full align-middle max-w-full">
@@ -183,12 +228,14 @@ export default function Table({ schedules }) {
                                             >
                                                 <PencilIcon className="w-5" />
                                             </Link>
-                                            <Link
-                                                href={`/dashboard/schedule`}
-                                                className="rounded-md border p-2 hover:bg-gray-100"
+                                            <button
+                                                className="rounded-md border p-2 hover:bg-gray-100 cursor-pointer"
+                                                onClick={() => handleDelete(schedule.id)}
                                             >
-                                                <TrashIcon className="w-5" />
-                                            </Link>
+                                                {
+                                                    loading && (schedule.id === deleteId) ? <div className="self-center justify-self-end"><Loading small /></div> : <TrashIcon className="w-5" />
+                                                }
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>
@@ -202,6 +249,8 @@ export default function Table({ schedules }) {
                     }
                 </div>
             </div>
+            <YesNo setAnswer={setAnswer} show={!!deleteId && !answer} message="Delete schedule?" />
+            <ToastContainer autoClose={3500} position="top-right" />
         </div>
     )
 }

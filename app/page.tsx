@@ -11,8 +11,8 @@ export default function Home() {
     const [password, setPassword] = useState("");
     return (
         <main className="flex h-screen">
-            <div className="bg-white basis-[65%] h-full bg-signin-hero bg-no-repeat bg-center"></div>
-            <div className="bg-primary basis-[35%] h-full flex justify-center items-center">
+            <div className="hidden md:block bg-white basis-[65%] h-full bg-signin-hero bg-no-repeat bg-center"></div>
+            <div className="bg-primary md:basis-[35%] h-full w-full flex justify-center items-center">
                 <div className="flex flex-col gap-10 w-3/4">
                     <Image
                         src="/single-bulb.jpeg"
