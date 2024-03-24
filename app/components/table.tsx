@@ -223,7 +223,7 @@ export default function Table({ schedules }) {
                                     <td className="whitespace-nowrap py-3 pl-6 pr-3">
                                         <div className="flex justify-end gap-3">
                                             <Link
-                                                href={`/dashboard/schedule`}
+                                                href={`/dashboard/schedule/12a34b56c78d9-${schedule.id}/edit`}
                                                 className="rounded-md border p-2 hover:bg-gray-100"
                                             >
                                                 <PencilIcon className="w-5" />

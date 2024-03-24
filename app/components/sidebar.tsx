@@ -15,8 +15,8 @@ export default function Sidebar() {
         <div className='hidden sm:flex w-[length:var(--sidebar-width)] fixed z-10 h-screen max-h-screen bg-primary flex-col justify-between py-12'>
             <Image
                 src="/single-bulb.jpeg"
-                width={80}
-                height={80}
+                width={70}
+                height={70}
                 className="ml-auto mr-auto rounded-[50%] mb-10"
                 alt="logo"
             />
