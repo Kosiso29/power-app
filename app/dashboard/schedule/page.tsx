@@ -17,7 +17,7 @@ export default function Schedule() {
 
     const getData = async () => {
         await new Promise((resolve, reject) => {
-            axios.get('https://5jl4i1e6j7.execute-api.eu-west-3.amazonaws.com/dev/12a34b56c78d9')
+            axios.get('https://5jl4i1e6j7.execute-api.eu-west-3.amazonaws.com/dev/12a34b56c78d9?sort_key=')
                 .then(response => response.data)
                 .then(data => {
                     setSchedules(data);

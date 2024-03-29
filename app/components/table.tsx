@@ -42,7 +42,6 @@ export default function Table({ schedules }) {
                     setLoading(false);
                     setAnswer("");
                     toast.success('Schedule deleted');
-                    console.log('response', response?.data)
                     resolve(response);
                 })
                 .then(() => window.location.reload())

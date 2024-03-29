@@ -20,7 +20,7 @@ const switches = ['SW1', 'SW2', 'SW3', 'SW4']
 
 const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
-export default function Form() {
+export default function Form({ schedule }: { schedule?: any }) {
     const [loading, setLoading] = useState(false);
 
     const postData = async (apiData: any) => {
@@ -28,8 +28,24 @@ export default function Form() {
             axios.post('https://5jl4i1e6j7.execute-api.eu-west-3.amazonaws.com/dev', { ...apiData })
                 .then(response => {
                     setLoading(false);
-                    console.log('schedule Id', response.data);
                     toast.success('Schedule created');
+                    resolve(response);
+                })
+                .then(() => window.location.href = "/dashboard/schedule")
+                .catch((error) => {
+                    setLoading(false);
+                    toast.error(`There was an error: ${error?.response?.data || error?.response || error}`)
+                });
+        })
+    }
+
+    const patchData = async (apiData: any) => {
+        console.log('endpoint', `https://5jl4i1e6j7.execute-api.eu-west-3.amazonaws.com/dev/12a34b56c78d9?sort_key=${schedule.id}`)
+        await new Promise((resolve, reject) => {
+            axios.put(`https://5jl4i1e6j7.execute-api.eu-west-3.amazonaws.com/dev/12a34b56c78d9?sort_key=${schedule.id}`, { ...apiData })
+                .then(response => {
+                    setLoading(false);
+                    toast.success('Schedule updated');
                     resolve(response);
                 })
                 .then(() => window.location.href = "/dashboard/schedule")
@@ -63,7 +79,20 @@ export default function Form() {
 
         console.log('apiData', apiData);
 
-        await postData(apiData);
+        if (schedule) {
+            await patchData(apiData);
+        } else {
+            await postData(apiData);
+        }
+    }
+
+    const convertIntegerTime = (time) => {
+        if (!time) return;
+        let newTime = time.toString();
+        if (newTime.length < 4) {
+            newTime = "0" + newTime;
+        }
+        return newTime.slice(0, 2) + ":" + newTime.slice(2);
     }
 
     return (
@@ -79,16 +108,16 @@ export default function Form() {
                             id="scheduleType"
                             name="schedule_type"
                             className="peer block w-full cursor-pointer rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
-                            defaultValue=""
+                            defaultValue={schedule?.schedule_type || ""}
                             aria-describedby="scheduleType-error"
                         >
                             <option value="" disabled>
                                 Select a type
                             </option>
-                            <option>
+                            <option value="Automatic">
                                 Automatic
                             </option>
-                            <option>
+                            <option value="Manual">
                                 Manual
                             </option>
                         </select>
@@ -107,6 +136,7 @@ export default function Form() {
                                 id="scheduleName"
                                 name="schedule_name"
                                 type="text"
+                                defaultValue={schedule?.schedule_name}
                                 placeholder="Name of Schedule"
                                 className="peer block w-full rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
                                 aria-describedby="scheduleName-error"
@@ -136,6 +166,7 @@ export default function Form() {
                                             id={item}
                                             name="switches"
                                             type="checkbox"
+                                            defaultChecked={schedule?.switches.includes(item)}
                                             value={item}
                                             className="h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-2"
                                             aria-describedby="switches-error"
@@ -155,7 +186,7 @@ export default function Form() {
                     <div className="rounded-md border border-gray-200 bg-white px-[14px] py-3 text-[.8rem] w-fit flex gap-2 items-center">
                         <span>OFF</span>
                         <label htmlFor='effect' className="switch">
-                            <input id='effect' name='effect' type="checkbox" className="" />
+                            <input id='effect' name='effect' type="checkbox" defaultChecked={schedule?.effect === "on"} className="" />
                             <span className="slider"></span>
                         </label>
                         <span>ON</span>
@@ -173,7 +204,7 @@ export default function Form() {
                                 id="startDate"
                                 name="start_date"
                                 type="date"
-                                defaultValue={new Date().toISOString().split('T')[0]}
+                                defaultValue={schedule ? schedule?.start_date : new Date().toISOString().split('T')[0]}
                                 placeholder="Start date"
                                 className="peer block w-full rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
                                 aria-describedby="startDate-error"
@@ -194,7 +225,7 @@ export default function Form() {
                                 id="endDate"
                                 name="end_date"
                                 type="date"
-                                defaultValue={new Date().toISOString().split('T')[0]}
+                                defaultValue={schedule ? schedule?.end_date : new Date().toISOString().split('T')[0]}
                                 placeholder="End date"
                                 className="peer block w-full rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
                                 aria-describedby="endDate-error"
@@ -215,7 +246,7 @@ export default function Form() {
                                 id="startTime"
                                 name="from"
                                 type="time"
-                                defaultValue={`${new Date().getHours().toString().padStart(2, '0')}:${new Date().getMinutes().toString().padStart(2, '0')}`}
+                                defaultValue={schedule ? convertIntegerTime(schedule?.from) : `${new Date().getHours().toString().padStart(2, '0')}:${new Date().getMinutes().toString().padStart(2, '0')}`}
                                 placeholder="Start time"
                                 className="peer block w-full rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
                                 aria-describedby="startTime-error"
@@ -236,7 +267,7 @@ export default function Form() {
                                 id="endTime"
                                 name="to"
                                 type="time"
-                                defaultValue={`${new Date().getHours().toString().padStart(2, '0')}:${new Date().getMinutes().toString().padStart(2, '0')}`}
+                                defaultValue={schedule ? convertIntegerTime(schedule?.to) : `${new Date().getHours().toString().padStart(2, '0')}:${new Date().getMinutes().toString().padStart(2, '0')}`}
                                 placeholder="End time"
                                 className="peer block w-full rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
                                 aria-describedby="endTime-error"
@@ -258,7 +289,7 @@ export default function Form() {
                                     id="status"
                                     name="status"
                                     type="radio"
-                                    defaultChecked
+                                    defaultChecked={schedule?.status === "active"}
                                     value="active"
                                     className="h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-2"
                                     aria-describedby="status-error"
@@ -275,6 +306,7 @@ export default function Form() {
                                     id="status"
                                     name="status"
                                     type="radio"
+                                    defaultChecked={schedule?.status === "inactive"}
                                     value="inactive"
                                     className="h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-2"
                                     aria-describedby="status-error"
@@ -310,6 +342,7 @@ export default function Form() {
                                             id={item}
                                             name="days"
                                             type="checkbox"
+                                            defaultChecked={schedule?.days.includes(item)}
                                             value={item}
                                             className="h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-2"
                                             aria-describedby="days-error"
@@ -332,7 +365,7 @@ export default function Form() {
                     className="flex h-10 items-center rounded-lg bg-blue-600 px-4 text-sm font-medium text-white transition-colors hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
                     onClick={() => setLoading(true)}
                 >
-                    <span className="hidden md:block">Create Schedule</span>
+                    <span className="hidden md:block">{schedule ? "Update Schedule" : "Create Schedule"}</span>
                 </button>
                 {
                     loading ? <div className='self-center'><Loading small /></div> : null
