@@ -152,7 +152,7 @@ export default function Form({ schedule }: { schedule?: any }) {
                         Switches
                     </legend>
                     <div className="rounded-md border border-gray-200 bg-white px-[14px] py-3">
-                        <div className="flex gap-4">
+                        <div className="flex flex-wrap gap-4">
                             {
                                 switches.map((item, index) => (
                                     <div key={item} className="flex items-center gap-2">
@@ -283,7 +283,7 @@ export default function Form({ schedule }: { schedule?: any }) {
                         Set schedule status
                     </legend>
                     <div className="rounded-md border border-gray-200 bg-white px-[14px] py-3">
-                        <div className="flex gap-4">
+                        <div className="flex flex-wrap gap-4">
                             <div className="flex items-center">
                                 <input
                                     id="status"
@@ -328,7 +328,7 @@ export default function Form({ schedule }: { schedule?: any }) {
                         Days
                     </legend>
                     <div className="rounded-md border border-gray-200 bg-white px-[14px] py-3">
-                        <div className="flex gap-4">
+                        <div className="flex flex-wrap gap-4">
                             {
                                 days.map(item => (
                                     <div key={item} className="flex items-center gap-2">
@@ -354,7 +354,7 @@ export default function Form({ schedule }: { schedule?: any }) {
                     </div>
                 </fieldset>
             </div>
-            <div className="mt-6 flex justify-end gap-4">
+            <div className="mt-6 flex justify-center md:justify-end gap-4">
                 <Link
                     href="/dashboard/schedule"
                     className="flex h-10 items-center rounded-lg bg-gray-100 px-4 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200"
@@ -365,7 +365,7 @@ export default function Form({ schedule }: { schedule?: any }) {
                     className="flex h-10 items-center rounded-lg bg-blue-600 px-4 text-sm font-medium text-white transition-colors hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
                     onClick={() => setLoading(true)}
                 >
-                    <span className="hidden md:block">{schedule ? "Update Schedule" : "Create Schedule"}</span>
+                    <span>{schedule ? "Update Schedule" : "Create Schedule"}</span>
                 </button>
                 {
                     loading ? <div className='self-center'><Loading small /></div> : null
