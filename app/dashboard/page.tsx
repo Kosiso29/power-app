@@ -10,6 +10,8 @@ import VerticalBarChart from "../components/vertical-bar-chart";
 import PieChart from "../components/pie-chart";
 import BarChart from "../components/bar-chart";
 import axios from "axios";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function Dashboard() {
     const [dailyConsumption, setDailyConsumption] = useState({});
@@ -60,12 +62,16 @@ export default function Dashboard() {
             </div>
             <div className='bg-white w-full mt-16 rounded-lg md:p-12 py-12 px-2 h-auto'>
                 <div className="flex justify-between h-auto">
-                    <div className='flex justify-evenly text-gray-400 flex-wrap gap-[10%] basis-[50%] items-center pr-[5%]'>
+                    <div className='flex justify-evenly text-gray-400 flex-wrap gap-[15%] basis-[50%] items-center pr-[5%]'>
                         {
                             Object.keys(totalPowerBySwitches).map((item, index) => (
                                 <Appliance key={item} text={item} initialShow={index % 2 ? false : true} />
                             ))
                         }
+                        <Appliance text={"SW17"} initialShow={false} switchNumber='17' />
+                        <Appliance text={"SW22"} initialShow={false} switchNumber='22' />
+                        <Appliance text={"SW23"} initialShow={false} switchNumber='23' />
+                        <Appliance text={"SW27"} initialShow={false} switchNumber='27' />
                     </div>
                     <div className='text-gray-500 gap-[30%] border-l-2 border-gray-300 items-center basis-[50%]'>
                         <h1 className='text-xl text-primary pb-8 pl-[10%]'>Insights</h1>
@@ -87,6 +93,7 @@ export default function Dashboard() {
                     </div>
                 </div>
             </div>
+            <ToastContainer autoClose={3500} position="top-right" />
         </div>
     )
 }
