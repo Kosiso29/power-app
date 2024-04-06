@@ -14,7 +14,7 @@ export default function Appliance({ initialShow = false, text, size = 40, defaul
         const apiData = {
             "device_id": "12a34b56c78d9",
             "switch": switchNumber,
-            "state": show ? 1 : 0
+            "state": show ? 0 : 1
         }
         await new Promise((resolve, reject) => {
             axios.post(`https://31ei84b150.execute-api.eu-west-3.amazonaws.com/dev/switch`, apiData)
@@ -22,12 +22,12 @@ export default function Appliance({ initialShow = false, text, size = 40, defaul
                 .then(data => {
                     setLoading(false);
                     setShow(prevState => !prevState);
-                    toast.success(`SW${switchNumber} triggered: ` + data);
+                    toast.success(`SW${text.replace("SW", "")} triggered: ` + data);
                     resolve(data);
                 })
                 .catch((error) => {
                     setLoading(false);
-                    toast.error(`SW${switchNumber} triggered: ` + error?.data || error);
+                    toast.error(`SW${text.replace("SW", "")} error: ` + error?.data || error);
                 });
         })
     }
