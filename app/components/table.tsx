@@ -143,25 +143,25 @@ export default function Table({ schedules }) {
                     <table className="hidden min-w-full text-gray-900 lg:table max-w-full">
                         <thead className="rounded-lg text-left text-sm font-normal">
                             <tr>
-                                <th scope="col" className="px-4 py-5 font-medium sm:pl-6">
+                                <th scope="col" className="px-4 py-5 font-medium sm:pl-6 hover:resize-x overflow-hidden min-w-full">
                                     Schedule name
                                 </th>
-                                <th scope="col" className="px-3 py-5 font-medium">
+                                <th scope="col" className="px-3 py-5 font-medium hover:resize-x overflow-hidden min-w-full">
                                     Schedule type
                                 </th>
-                                <th scope="col" className="px-3 py-5 font-medium">
+                                <th scope="col" className="px-3 py-5 font-medium hover:resize-x overflow-hidden min-w-full">
                                     Switches
                                 </th>
-                                <th scope="col" className="px-3 py-5 font-medium">
+                                <th scope="col" className="px-3 py-5 font-medium hover:resize-x overflow-hidden min-w-full">
                                     Start time / date
                                 </th>
-                                <th scope="col" className="px-3 py-5 font-medium">
+                                <th scope="col" className="px-3 py-5 font-medium hover:resize-x overflow-hidden min-w-full">
                                     End time / date
                                 </th>
-                                <th scope="col" className="px-3 py-5 font-medium">
+                                <th scope="col" className="px-3 py-5 font-medium hover:resize-x overflow-hidden min-w-full">
                                     Status
                                 </th>
-                                <th scope="col" className="px-3 py-5 font-medium">
+                                <th scope="col" className="px-3 py-5 font-medium hover:resize-x overflow-hidden min-w-full">
                                     Days
                                 </th>
                                 <th scope="col" className="relative py-3 pl-6 pr-3">
@@ -175,24 +175,24 @@ export default function Table({ schedules }) {
                                     key={schedule.id}
                                     className="w-full max-w-full border-b py-3 text-sm last-of-type:border-none [&:first-child>td:first-child]:rounded-tl-lg [&:first-child>td:last-child]:rounded-tr-lg [&:last-child>td:first-child]:rounded-bl-lg [&:last-child>td:last-child]:rounded-br-lg"
                                 >
-                                    <td className="whitespace-nowrap py-3 pl-6 pr-3">
-                                        <div className="flex items-center gap-2">
+                                    <td className="xl:whitespace-nowrap py-3 pl-6 pr-3 hover:resize-x overflow-hidden min-w-full">
+                                        <span className="flex items-center gap-2">
                                             <Appliance size={15} defaultShow={schedule.effect === "on"} className='p-1 cursor-default' /> <span>{schedule.schedule_name}</span>
-                                        </div>
+                                        </span>
                                     </td>
-                                    <td className="whitespace-nowrap px-3 py-3">
+                                    <td className="whitespace-nowrap px-3 py-3 hover:resize-x overflow-hidden min-w-full">
                                         {schedule.schedule_type}
                                     </td>
-                                    <td className="px-3 py-3">
+                                    <td className="px-3 py-3 hover:resize-x overflow-hidden min-w-full">
                                         {schedule.switches.toString().replace(/[|]/g, "").replace(/,/g, ' ')}
                                     </td>
-                                    <td className="px-3 py-3">
+                                    <td className="px-3 py-3 hover:resize-x overflow-hidden min-w-full">
                                         {schedule.from} / {schedule.start_date}
                                     </td>
-                                    <td className="px-3 py-3">
+                                    <td className="px-3 py-3 hover:resize-x overflow-hidden min-w-full">
                                         {schedule.to} / {schedule.end_date}
                                     </td>
-                                    <td className="whitespace-nowrap px-3 py-3">
+                                    <td className="whitespace-nowrap px-3 py-3 hover:resize-x overflow-hidden min-w-full">
                                         {
                                             schedule.status === 'active' ?
                                                 <span
@@ -207,7 +207,7 @@ export default function Table({ schedules }) {
                                                 </span>
                                         }
                                     </td>
-                                    <td className="px-3 py-3">
+                                    <td className="px-3 py-3 hover:resize-x overflow-hidden min-w-full">
                                         <div className='flex flex-wrap'>
                                             {
                                                 Object.entries(daysMap).map((entry, index) => {
