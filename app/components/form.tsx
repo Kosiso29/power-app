@@ -40,7 +40,6 @@ export default function Form({ schedule }: { schedule?: any }) {
     }
 
     const patchData = async (apiData: any) => {
-        console.log('endpoint', `https://5jl4i1e6j7.execute-api.eu-west-3.amazonaws.com/dev/12a34b56c78d9?sort_key=${schedule.id}`)
         await new Promise((resolve, reject) => {
             axios.put(`https://5jl4i1e6j7.execute-api.eu-west-3.amazonaws.com/dev/12a34b56c78d9?sort_key=${schedule.id}`, { ...apiData })
                 .then(response => {
@@ -76,8 +75,6 @@ export default function Form({ schedule }: { schedule?: any }) {
             from: Number(formDataObject.from.replace(':', '')),
             to: Number(formDataObject.to.replace(':', ''))
         }
-
-        console.log('apiData', apiData);
 
         if (schedule) {
             await patchData(apiData);
