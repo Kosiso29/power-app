@@ -13,6 +13,8 @@ import axios from "axios";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+const mapSwitchToApiSwitch = { SW1: "17", SW2: "22", SW3: "23", SW4: "27" };
+
 export default function Dashboard() {
     const [dailyConsumption, setDailyConsumption] = useState({});
     const [recommendedActions, setRecommendedActions] = useState([]);
@@ -63,15 +65,11 @@ export default function Dashboard() {
             <div className='bg-white w-full mt-16 rounded-lg md:p-12 py-12 px-2 h-auto'>
                 <div className="flex justify-between h-auto">
                     <div className='flex justify-evenly text-gray-400 flex-wrap gap-[15%] basis-[50%] items-center pr-[5%]'>
-                        {/*
+                        {
                             Object.keys(totalPowerBySwitches).map((item, index) => (
-                                <Appliance key={item} text={item} initialShow={index % 2 ? false : true} />
+                                <Appliance key={item} text={item} switchNumber={mapSwitchToApiSwitch[item]} />
                             ))
-                            */}
-                        <Appliance text={"SW1"} initialShow={false} switchNumber='17' />
-                        <Appliance text={"SW2"} initialShow={false} switchNumber='22' />
-                        <Appliance text={"SW3"} initialShow={false} switchNumber='23' />
-                        <Appliance text={"SW4"} initialShow={false} switchNumber='27' />
+                        }
                     </div>
                     <div className='text-gray-500 gap-[30%] border-l-2 border-gray-300 items-center basis-[50%]'>
                         <h1 className='text-xl text-primary pb-8 pl-[10%]'>Insights</h1>
@@ -79,14 +77,14 @@ export default function Dashboard() {
                         <div className="flex flex-wrap text-gray-400 gap-2 pl-[14%] mt-5">
                             {
                                 switchesToTurnOff.map(item => (
-                                    <Appliance key={item} text={item} initialShow={true} />
+                                    <Appliance key={item} text={item} switchNumber={mapSwitchToApiSwitch[item]} />
                                 ))
                             }
                         </div>
                         <ul className='h-60 flex flex-col gap-5 px-7 sm:px-[10%]'>
                             {
                                 recommendedActions.map(item => (
-                                    <li key={item} className='text-gray-500 list-disc marker:text-primary marker:text-xl py-1'>{item}</li>
+                                    <li key={item} className='text-gray-500 list-disc marker:text-primary marker:text-xl py-1'>{item.replace("SW2", "ACs & Heaters").replace("SW4", "Wall Sucket")}</li>
                                 ))
                             }
                         </ul>
