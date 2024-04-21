@@ -9,7 +9,9 @@ import TextInput from "./ui/text-input";
 import { useEffect, useState } from "react";
 import Amplify, { Auth } from "aws-amplify";
 import { AwsConfigAuth } from "./config/auth";
-import Link from "next/link";
+import { useRouter } from 'next/navigation';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 Amplify.configure({ Auth: AwsConfigAuth });
 
@@ -18,8 +20,21 @@ export default function Home() {
     const [password, setPassword] = useState("");
     const [login, setLogin] = useState(false);
 
+    const router = useRouter();
+
     const signIn = async () => {
-        const user = await Auth.signIn("nonsoilonze@gmail.com", "Cognito5050?");
+        try {
+            const user = await Auth.signIn(email, password);
+            console.log('user', user);
+            if (user?.username) {
+                toast.success('Login successful!');
+                router.push('/dashboard');
+            } else {
+                toast.error('Login failed! User not found');
+            }
+        } catch (error) {
+            toast.error(`Login failed: ${error?.message || error}`);
+        }
     }
 
     useEffect(() => {
@@ -41,12 +56,11 @@ export default function Home() {
                         alt="logo"
                     />
                     <TextInput type="email" value={email} placeholder="Email" onChange={setEmail} />
-                    <TextInput type="string" value={password} placeholder="Password" onChange={setPassword} />
-                    {/* <Link href="/dashboard">
-                    </Link> */}
+                    <TextInput type="password" value={password} placeholder="Password" onChange={setPassword} />
                     <Button onClick={() => setLogin(true)}>Login</Button>
                 </div>
             </div>
+            <ToastContainer autoClose={3500} position="top-right" />
         </main>
     );
 }
