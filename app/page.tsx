@@ -21,6 +21,7 @@ export default function Home() {
     const [login, setLogin] = useState(false);
 
     const router = useRouter();
+    console.log('process', process.env.NODE_ENV);
 
     const signIn = async () => {
         try {
