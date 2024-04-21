@@ -7,6 +7,7 @@ import PrimaryButton from "../../ui/button";
 import Table from "../../components/table";
 import Search from "../../components/search";
 import { useEffect, useState } from "react";
+import { getCookieByNameEndsWith } from "@/app/utils/getCookies";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { schedulesActions } from "@/app/store/schedules";
@@ -15,9 +16,13 @@ export default function Schedule() {
     const [schedules, setSchedules] = useState([]);
     const dispatch = useDispatch();
 
-    const getData = async () => {
+    const getData = async (idToken) => {
         await new Promise((resolve, reject) => {
-            axios.get('https://5jl4i1e6j7.execute-api.eu-west-3.amazonaws.com/dev/12a34b56c78d9?sort_key=')
+            axios.get('https://5jl4i1e6j7.execute-api.eu-west-3.amazonaws.com/dev/12a34b56c78d9?sort_key=', {
+                headers: {
+                    'Authorization': `${idToken}`
+                }
+            })
                 .then(response => response.data)
                 .then(data => {
                     setSchedules(data);
@@ -31,7 +36,8 @@ export default function Schedule() {
     }, [schedules, dispatch])
 
     useEffect(() => {
-        getData();
+        const idToken = getCookieByNameEndsWith('idToken');
+        getData(idToken);
     }, []);
 
     return (

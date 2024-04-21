@@ -9,6 +9,7 @@ import Appliance from "../components/appliance";
 import VerticalBarChart from "../components/vertical-bar-chart";
 import PieChart from "../components/pie-chart";
 import BarChart from "../components/bar-chart";
+import { getCookieByNameEndsWith } from "@/app/utils/getCookies";
 import axios from "axios";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -38,6 +39,7 @@ export default function Dashboard() {
     }
 
     useEffect(() => {
+        const idToken = getCookieByNameEndsWith('idToken');
         getData();
     }, []);
 
