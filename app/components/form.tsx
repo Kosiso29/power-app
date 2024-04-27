@@ -13,6 +13,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { ToastContainer, toast } from 'react-toastify';
 import Loading from "@/app/components/loading";
+import { getCookieByNameEndsWith } from "@/app/utils/getCookies";
 import axios from "axios";
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -23,9 +24,14 @@ const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'
 export default function Form({ schedule }: { schedule?: any }) {
     const [loading, setLoading] = useState(false);
 
-    const postData = async (apiData: any) => {
+    const postData = async (apiData: any, idToken) => {
+        console.log('idToken', idToken);
         await new Promise((resolve, reject) => {
-            axios.post('https://5jl4i1e6j7.execute-api.eu-west-3.amazonaws.com/dev', { ...apiData })
+            axios.post('https://5jl4i1e6j7.execute-api.eu-west-3.amazonaws.com/dev', { ...apiData }, {
+                headers: {
+                    'Authorization': `${idToken}`
+                }
+            })
                 .then(response => {
                     setLoading(false);
                     toast.success('Schedule created');
@@ -39,9 +45,13 @@ export default function Form({ schedule }: { schedule?: any }) {
         })
     }
 
-    const patchData = async (apiData: any) => {
+    const patchData = async (apiData: any, idToken) => {
         await new Promise((resolve, reject) => {
-            axios.put(`https://5jl4i1e6j7.execute-api.eu-west-3.amazonaws.com/dev/12a34b56c78d9?sort_key=${schedule.id}`, { ...apiData })
+            axios.put(`https://5jl4i1e6j7.execute-api.eu-west-3.amazonaws.com/dev/12a34b56c78d9?sort_key=${schedule.id}`, { ...apiData }, {
+                headers: {
+                    'Authorization': `${idToken}`
+                }
+            })
                 .then(response => {
                     setLoading(false);
                     toast.success('Schedule updated');
@@ -75,11 +85,12 @@ export default function Form({ schedule }: { schedule?: any }) {
             from: Number(formDataObject.from.replace(':', '')),
             to: Number(formDataObject.to.replace(':', ''))
         }
+        const idToken: any = getCookieByNameEndsWith('idToken');
 
         if (schedule) {
-            await patchData(apiData);
+            await patchData(apiData, idToken);
         } else {
-            await postData(apiData);
+            await postData(apiData, idToken);
         }
     }
 

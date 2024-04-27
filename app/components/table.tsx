@@ -12,6 +12,7 @@ import Appliance from "./appliance";
 import Loading from "@/app/components/loading";
 import YesNo from "./yesno";
 import { ToastContainer, toast } from 'react-toastify';
+import { getCookieByNameEndsWith } from "@/app/utils/getCookies";
 import 'react-toastify/dist/ReactToastify.css';
 import { useState, useEffect } from 'react';
 
@@ -34,9 +35,13 @@ export default function Table({ schedules }) {
         setDeleteId(id);
     }
 
-    const postData = async () => {
+    const deleteData = async (idToken) => {
         await new Promise((resolve) => {
-            axios.delete(`https://5jl4i1e6j7.execute-api.eu-west-3.amazonaws.com/dev/12a34b56c78d9?sort_key=${deleteId}`)
+            axios.delete(`https://5jl4i1e6j7.execute-api.eu-west-3.amazonaws.com/dev/12a34b56c78d9?sort_key=${deleteId}`, {
+                headers: {
+                    'Authorization': `${idToken}`
+                }
+            })
                 .then(response => {
                     setDeleteId("");
                     setLoading(false);
@@ -54,8 +59,9 @@ export default function Table({ schedules }) {
 
     useEffect(() => {
         if (answer === "yes") {
+            const idToken: any = getCookieByNameEndsWith('idToken');
             setLoading(true);
-            postData();
+            deleteData(idToken);
         }
         if (answer === "no") {
             setAnswer("");

@@ -15,6 +15,7 @@ import {
 import { ToastContainer, toast } from 'react-toastify';
 import Loading from "@/app/components/loading";
 import Form from "@/app/components/form";
+import { getCookieByNameEndsWith } from "@/app/utils/getCookies";
 import axios from "axios";
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -22,10 +23,14 @@ export default function Page({ params }: { params: { id: string } }) {
     const [schedule, setSchedule] = useState(null);
 
 
-    const getData = async () => {
+    const getData = async (idToken: string) => {
         const [deviceId, scheduleId] = params.id.split("-");
         await new Promise((resolve, reject) => {
-            axios.get(`https://5jl4i1e6j7.execute-api.eu-west-3.amazonaws.com/dev/schedules/${scheduleId}?device_id=${deviceId}`)
+            axios.get(`https://5jl4i1e6j7.execute-api.eu-west-3.amazonaws.com/dev/schedules/${scheduleId}?device_id=${deviceId}`, {
+                headers: {
+                    'Authorization': `${idToken}`
+                }
+            })
                 .then(response => response.data)
                 .then(data => {
                     setSchedule(data);
@@ -36,7 +41,8 @@ export default function Page({ params }: { params: { id: string } }) {
     }
 
     useEffect(() => {
-        getData();
+        const idToken: any = getCookieByNameEndsWith('idToken');
+        getData(idToken);
     }, [params.id]);
 
     return (
