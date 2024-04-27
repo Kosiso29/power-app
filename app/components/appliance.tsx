@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { LightBulbIcon } from "@heroicons/react/24/outline";
 import Loading from "@/app/components/loading";
 import { toast } from 'react-toastify';
+import { getCookieByNameEndsWith } from "@/app/utils/getCookies";
 import axios from "axios";
 
 export default function Appliance({ initialShow = false, text, size = 40, defaultShow, className, switchNumber }: { initialShow?: boolean, text: string, size?: string | number, defaultShow?: boolean, className?: string, switchNumber?: string }) {
@@ -11,9 +12,13 @@ export default function Appliance({ initialShow = false, text, size = 40, defaul
     const [switchClicked, setSwitchClicked] = useState(false);
     const [alias, setAlias] = useState("");
 
-    const getData = async () => {
+    const getData = async (idToken: string) => {
         await new Promise((resolve, reject) => {
-            axios.get(`https://yjvfp0vdp2.execute-api.eu-west-3.amazonaws.com/dev/12a34b56c78d9?switch_name=SW${switchNumber}`)
+            axios.get(`https://yjvfp0vdp2.execute-api.eu-west-3.amazonaws.com/dev/12a34b56c78d9?switch_name=SW${switchNumber}`, {
+                headers: {
+                    'Authorization': `${idToken}`
+                }
+            })
                 .then(response => response.data)
                 .then(data => {
                     setAlias(data?.switch_alias)
@@ -28,7 +33,7 @@ export default function Appliance({ initialShow = false, text, size = 40, defaul
         })
     }
 
-    const postData = async () => {
+    const postData = async (idToken: string) => {
         const apiData = {
             "device_id": "12a34b56c78d9",
             "switch_name": `SW${switchNumber}`,
@@ -36,7 +41,11 @@ export default function Appliance({ initialShow = false, text, size = 40, defaul
             "current_state": show ? 0 : 1
         }
         await new Promise((resolve, reject) => {
-            axios.put(`https://yjvfp0vdp2.execute-api.eu-west-3.amazonaws.com/dev/12a34b56c78d9?switch_name=SW${switchNumber}`, apiData)
+            axios.put(`https://yjvfp0vdp2.execute-api.eu-west-3.amazonaws.com/dev/12a34b56c78d9?switch_name=SW${switchNumber}`, apiData, {
+                headers: {
+                    'Authorization': `${idToken}`
+                }
+            })
                 .then(response => response.data)
                 .then(data => {
                     setLoading(false);
@@ -63,14 +72,16 @@ export default function Appliance({ initialShow = false, text, size = 40, defaul
     }
 
     useEffect(() => {
+        const idToken: any = getCookieByNameEndsWith('idToken');
         if (switchClicked) {
-            postData();
+            postData(idToken);
         }
     }, [switchClicked, switchNumber])
 
     useEffect(() => {
+        const idToken: any = getCookieByNameEndsWith('idToken');
         if (switchNumber) {
-            getData();
+            getData(idToken);
         } else {
             setLoading(false);
         }
