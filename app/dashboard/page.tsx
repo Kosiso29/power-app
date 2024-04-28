@@ -22,10 +22,14 @@ export default function Dashboard() {
     const [switchesToTurnOff, setSwitchesToTurnOff] = useState([]);
     const [totalPowerBySwitches, setTotalPowerBySwitches] = useState([]);
     const [availablePower, setAvailablePower] = useState([]);
-    const getData = async () => {
+    const getData = async (idToken) => {
         await new Promise((resolve, reject) => {
-            axios.get('https://haargkjp4icg6n32efofw4yuom0qgbvd.lambda-url.eu-west-3.on.aws/')
-                .then(response => response.data)
+            axios.get('https://qn0kmnnt46.execute-api.eu-west-3.amazonaws.com/dev', {
+                headers: {
+                    'Authorization': `${idToken}`
+                }
+            })
+                .then(response => JSON.parse(response.data.body))
                 .then(data => {
                     setDailyConsumption(data.daily_consumption);
                     setRecommendedActions(data.insights.recommended_actions);
@@ -40,7 +44,7 @@ export default function Dashboard() {
 
     useEffect(() => {
         const idToken = getCookieByNameEndsWith('idToken');
-        getData();
+        getData(idToken);
     }, []);
 
     return (
