@@ -2,6 +2,7 @@ import React from 'react';
 import NavLink from "./nav-link";
 import Image from "next/image";
 import { HomeModernIcon, ClockIcon, TableCellsIcon, Cog6ToothIcon, ArrowLeftEndOnRectangleIcon } from "@heroicons/react/24/outline";
+import Logout from "./logout";
 
 const sideBarData = [
     { name: "OVERVIEW", href: "/dashboard", icon: HomeModernIcon },
@@ -34,9 +35,7 @@ export default function Sidebar() {
                 }
             </div>
             <div className="flex justify-center items-center">
-                <NavLink href="/">
-                    <ArrowLeftEndOnRectangleIcon color='rgba(210, 210, 210, .4)' width={50} height={50} />
-                </NavLink>
+                <Logout />
             </div>
         </div>
     )
