@@ -13,6 +13,7 @@ import Loading from "@/app/components/loading";
 import YesNo from "./yesno";
 import { ToastContainer, toast } from 'react-toastify';
 import { getCookieByNameEndsWith } from "@/app/utils/getCookies";
+import { useSelector } from "react-redux";
 import 'react-toastify/dist/ReactToastify.css';
 import { useState, useEffect } from 'react';
 
@@ -30,6 +31,7 @@ export default function Table({ schedules }) {
     const [loading, setLoading] = useState(false);
     const [answer, setAnswer] = useState("");
     const [deleteId, setDeleteId] = useState("");
+    const deviceId = useSelector(state => state.authReducer.deviceId)
 
     const handleDelete = (id) => {
         setDeleteId(id);
@@ -37,7 +39,7 @@ export default function Table({ schedules }) {
 
     const deleteData = async (idToken) => {
         await new Promise((resolve) => {
-            axios.delete(`https://5jl4i1e6j7.execute-api.eu-west-3.amazonaws.com/dev/12a34b56c78d9?sort_key=${deleteId}`, {
+            axios.delete(`https://5jl4i1e6j7.execute-api.eu-west-3.amazonaws.com/dev/${deviceId}?sort_key=${deleteId}`, {
                 headers: {
                     'Authorization': `${idToken}`
                 }
@@ -228,7 +230,7 @@ export default function Table({ schedules }) {
                                     <td className="whitespace-nowrap py-3 pl-6 pr-3">
                                         <div className="flex justify-end gap-3">
                                             <Link
-                                                href={`/dashboard/schedule/12a34b56c78d9-${schedule.id}/edit`}
+                                                href={`/dashboard/schedule/${deviceId}-${schedule.id}/edit`}
                                                 className="rounded-md border p-2 hover:bg-gray-100"
                                             >
                                                 <PencilIcon className="w-5" />

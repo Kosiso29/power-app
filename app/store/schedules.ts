@@ -1,6 +1,6 @@
 'use client'
 
-import { configureStore, createSlice } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 
 const schedulesSlice = createSlice({
     name: 'schedules',
@@ -17,8 +17,8 @@ const schedulesSlice = createSlice({
     }
 });
 
-const store = configureStore({ reducer: { schedulesReducer: schedulesSlice.reducer } })
+
 
 export const schedulesActions = schedulesSlice.actions;
 
-export default store;
+export default schedulesSlice;

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 // @ts-nocheck
 'use client'
 
@@ -11,14 +12,16 @@ import { getCookieByNameEndsWith } from "@/app/utils/getCookies";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { schedulesActions } from "@/app/store/schedules";
+import { useSelector } from "react-redux";
 
 export default function Schedule() {
     const [schedules, setSchedules] = useState([]);
+    const deviceId = useSelector(state => state.authReducer.deviceId);
     const dispatch = useDispatch();
 
     const getData = async (idToken) => {
         await new Promise((resolve, reject) => {
-            axios.get('https://5jl4i1e6j7.execute-api.eu-west-3.amazonaws.com/dev/12a34b56c78d9?sort_key=', {
+            axios.get(`https://5jl4i1e6j7.execute-api.eu-west-3.amazonaws.com/dev/${deviceId}?sort_key=`, {
                 headers: {
                     'Authorization': `${idToken}`
                 }

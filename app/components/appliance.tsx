@@ -4,6 +4,7 @@ import { LightBulbIcon } from "@heroicons/react/24/outline";
 import Loading from "@/app/components/loading";
 import { toast } from 'react-toastify';
 import { getCookieByNameEndsWith } from "@/app/utils/getCookies";
+import { useSelector } from "react-redux";
 import axios from "axios";
 
 export default function Appliance({ initialShow = false, text, size = 40, defaultShow, className, switchNumber }: { initialShow?: boolean, text: string, size?: string | number, defaultShow?: boolean, className?: string, switchNumber?: string }) {
@@ -11,10 +12,11 @@ export default function Appliance({ initialShow = false, text, size = 40, defaul
     const [loading, setLoading] = useState(true);
     const [switchClicked, setSwitchClicked] = useState(false);
     const [alias, setAlias] = useState("");
+    const deviceId = useSelector((state: any) => state.authReducer.deviceId);
 
     const getData = async (idToken: string) => {
         await new Promise((resolve, reject) => {
-            axios.get(`https://yjvfp0vdp2.execute-api.eu-west-3.amazonaws.com/dev/12a34b56c78d9?switch_name=SW${switchNumber}`, {
+            axios.get(`https://yjvfp0vdp2.execute-api.eu-west-3.amazonaws.com/dev/${deviceId}?switch_name=SW${switchNumber}`, {
                 headers: {
                     'Authorization': `${idToken}`
                 }
@@ -35,13 +37,13 @@ export default function Appliance({ initialShow = false, text, size = 40, defaul
 
     const postData = async (idToken: string) => {
         const apiData = {
-            "device_id": "12a34b56c78d9",
+            "device_id": deviceId,
             "switch_name": `SW${switchNumber}`,
             "switch_alias": alias,
             "current_state": show ? 0 : 1
         }
         await new Promise((resolve, reject) => {
-            axios.put(`https://yjvfp0vdp2.execute-api.eu-west-3.amazonaws.com/dev/12a34b56c78d9?switch_name=SW${switchNumber}`, apiData, {
+            axios.put(`https://yjvfp0vdp2.execute-api.eu-west-3.amazonaws.com/dev/${deviceId}?switch_name=SW${switchNumber}`, apiData, {
                 headers: {
                     'Authorization': `${idToken}`
                 }

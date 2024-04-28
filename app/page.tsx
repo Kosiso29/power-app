@@ -11,6 +11,8 @@ import Amplify, { Auth } from "aws-amplify";
 import { AwsConfigAuth } from "./config/auth";
 import { useRouter } from 'next/navigation';
 import { ToastContainer, toast } from 'react-toastify';
+import { useDispatch } from "react-redux";
+import { authActions } from "@/app/store/auth";
 import 'react-toastify/dist/ReactToastify.css';
 
 Amplify.configure({ Auth: AwsConfigAuth });
@@ -19,6 +21,7 @@ export default function Home() {
     const [email, setEmail] = useState(process.env.NODE_ENV === 'development' ? process.env.NEXT_PUBLIC_AUTH_USER_NAME : "");
     const [password, setPassword] = useState(process.env.NODE_ENV === 'development' ? process.env.NEXT_PUBLIC_AUTH_PASSWORD : "");
     const [login, setLogin] = useState(false);
+    const dispatch = useDispatch();
 
     const router = useRouter();
 
@@ -28,6 +31,8 @@ export default function Home() {
             console.log('user', user);
             if (user?.username) {
                 toast.success('Login successful!');
+                dispatch(authActions.updateToken(user.signInUserSession.idToken.jwtToken));
+                dispatch(authActions.updateDeviceId(user.username));
                 router.push('/dashboard');
             } else {
                 toast.error('Login failed! User not found');
