@@ -16,8 +16,8 @@ import 'react-toastify/dist/ReactToastify.css';
 Amplify.configure({ Auth: AwsConfigAuth });
 
 export default function Home() {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+    const [email, setEmail] = useState(process.env.NODE_ENV === 'development' ? process.env.NEXT_PUBLIC_AUTH_USER_NAME : "");
+    const [password, setPassword] = useState(process.env.NODE_ENV === 'development' ? process.env.NEXT_PUBLIC_AUTH_PASSWORD : "");
     const [login, setLogin] = useState(false);
 
     const router = useRouter();
