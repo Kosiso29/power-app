@@ -12,7 +12,7 @@ import {
     ArrowPathRoundedSquareIcon,
     ArrowUturnDownIcon
 } from '@heroicons/react/24/outline';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import Loading from "@/app/components/loading";
 import Form from "@/app/components/form";
 import { getCookieByNameEndsWith } from "@/app/utils/getCookies";
@@ -53,7 +53,6 @@ export default function Page({ params }: { params: { id: string } }) {
             <div className='bg-white w-full mt-8 rounded-lg md:p-8 py-8 px-2 h-auto'>
                 { schedule ? <Form schedule={schedule} /> : <div><Loading /></div>}
             </div>
-            <ToastContainer autoClose={3500} position="top-right" />
         </div>
     );
 }

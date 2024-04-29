@@ -11,7 +11,7 @@ import PieChart from "../components/pie-chart";
 import BarChart from "../components/bar-chart";
 import { getCookieByNameEndsWith } from "@/app/utils/getCookies";
 import axios from "axios";
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const mapSwitchToApiSwitch = { SW1: "17", SW2: "22", SW3: "23", SW4: "27" };
@@ -97,7 +97,6 @@ export default function Dashboard() {
                     </div>
                 </div>
             </div>
-            <ToastContainer autoClose={3500} position="top-right" />
         </div>
     )
 }

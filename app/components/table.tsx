@@ -11,7 +11,7 @@ import Link from "next/link";
 import Appliance from "./appliance";
 import Loading from "@/app/components/loading";
 import YesNo from "./yesno";
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import { getCookieByNameEndsWith } from "@/app/utils/getCookies";
 import { useSelector } from "react-redux";
 import 'react-toastify/dist/ReactToastify.css';
@@ -257,7 +257,6 @@ export default function Table({ schedules }) {
                 </div>
             </div>
             <YesNo setAnswer={setAnswer} show={!!deleteId && !answer} message="Delete schedule?" />
-            <ToastContainer autoClose={3500} position="top-right" />
         </div>
     )
 }

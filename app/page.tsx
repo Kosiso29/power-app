@@ -10,10 +10,9 @@ import { useEffect, useState } from "react";
 import Amplify, { Auth } from "aws-amplify";
 import { AwsConfigAuth } from "./config/auth";
 import { useRouter } from 'next/navigation';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import { useDispatch } from "react-redux";
 import { authActions } from "@/app/store/auth";
-import 'react-toastify/dist/ReactToastify.css';
 
 Amplify.configure({ Auth: AwsConfigAuth });
 
@@ -65,7 +64,6 @@ export default function Home() {
                     <Button onClick={() => setLogin(true)}>Login</Button>
                 </div>
             </div>
-            <ToastContainer autoClose={3500} position="top-right" />
         </main>
     );
 }

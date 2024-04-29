@@ -11,7 +11,7 @@ import {
     ArrowPathRoundedSquareIcon,
     ArrowUturnDownIcon
 } from '@heroicons/react/24/outline';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import Loading from "@/app/components/loading";
 import { getCookieByNameEndsWith } from "@/app/utils/getCookies";
 import { useSelector } from "react-redux";
