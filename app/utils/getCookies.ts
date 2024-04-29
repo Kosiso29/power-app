@@ -1,3 +1,5 @@
+'use client'
+
 export function getCookieByNameEndsWith(suffix: string) {
     const cookies = document.cookie.split('; ');
     const suffixLength = suffix.length;
