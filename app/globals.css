@@ -68,8 +68,30 @@ input:checked+.slider:before {
     transform: translateX(16px);
 }
 
+.shadow-text {
+    text-shadow: 0 -2px 30px #0e82f6;
+    color: transparent;
+    background-image: linear-gradient(to right, #b4f8fa, #b4f8fa, #72e8f9, #b4f8fa);
+    background-clip: text;
+}
+
+.shadow-button {
+    color: #0e82f6;
+}
+
+.shadow-button:hover {
+    box-shadow: 0 -2px 30px #0e82f6;
+}
+
+.shadow-button:active {
+    background-color: transparent !important;
+    color: #72e8f9 !important;
+    border-color: #72e8f9 !important;
+    box-shadow: 0 -2px 30px #72e8f9;
+}
+
 @layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+    .text-balance {
+        text-wrap: balance;
+    }
 }
