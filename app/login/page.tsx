@@ -48,20 +48,32 @@ export default function Login() {
     }, [login])
 
     return (
-        <main className="flex h-screen">
-            <div className="hidden md:block bg-white basis-[65%] h-full bg-signin-hero bg-no-repeat bg-center"></div>
-            <div className="bg-primary md:basis-[35%] h-full w-full flex justify-center items-center">
-                <div className="flex flex-col gap-10 w-3/4">
-                    <Image
-                        src="/single-bulb.jpeg"
-                        width={100}
-                        height={100}
-                        className="m-auto rounded-[50%]"
-                        alt="logo"
-                    />
-                    <TextInput type="email" value={email} placeholder="Email" onChange={setEmail} />
-                    <TextInput type="password" value={password} placeholder="Password" onChange={setPassword} />
-                    <Button onClick={() => setLogin(true)}>Login</Button>
+        <main className="flex justify-center items-center h-screen sign-in-background">
+            <div className="flex h-3/4 w-3/4 shadow-2xl">
+                <div className="bg-[white] md:basis-[51%] h-full w-full flex justify-center items-center">
+                    <div className="flex flex-col gap-10 w-3/4">
+                        {/* <Image
+                            src="/sign-in-background.jpeg"
+                            width={100}
+                            height={100}
+                            className="m-auto rounded-[50%]"
+                            alt="logo"
+                        /> */}
+                        <h1 className="text-2xl font-bold">Sign in</h1>
+                        <TextInput type="email" value={email} placeholder="Email" onChange={setEmail} />
+                        <TextInput type="password" value={password} placeholder="Password" onChange={setPassword} />
+                        <div>
+                            <input id="RememberMe" className="cursor-pointer" type="checkbox" />
+                            <label htmlFor="RememberMe" className="ml-3 cursor-pointer">Remember me</label>
+                        </div>
+                        <Button onClick={() => setLogin(true)} className="bg-primary">Login</Button>
+                    </div>
+                </div>
+                <div className="hidden md:flex justify-center items-center basis-[49%] h-full bg-[#202474] bg-no-repeat bg-cover bg-center sign-in-right">
+                    <div className="text-white">
+                        <h1 className="text-6xl font-bold mb-10">Powersync</h1>
+                        <p className="text-lg">Power well managed is power well used, <br />allow us to manage your power!</p>
+                    </div>
                 </div>
             </div>
         </main>

@@ -90,6 +90,14 @@ input:checked+.slider:before {
     box-shadow: 0 -2px 30px #72e8f9;
 }
 
+.sign-in-background {
+    background-image: linear-gradient(to right, #3b65d5 50%, #EEF 50%)
+}
+
+.sign-in-right {
+    background-image: linear-gradient(to bottom right, #7d8cbf 1%, #202474, #202474)
+}
+
 @layer utilities {
     .text-balance {
         text-wrap: balance;
