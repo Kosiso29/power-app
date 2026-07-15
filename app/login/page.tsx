@@ -17,8 +17,8 @@ import { authActions } from "@/app/store/auth";
 Amplify.configure({ Auth: AwsConfigAuth });
 
 export default function Login() {
-    const [email, setEmail] = useState(process.env.NODE_ENV === 'development' ? process.env.NEXT_PUBLIC_AUTH_USER_NAME : "");
-    const [password, setPassword] = useState(process.env.NODE_ENV === 'development' ? process.env.NEXT_PUBLIC_AUTH_PASSWORD : "");
+    const [email, setEmail] = useState(process.env.NEXT_PUBLIC_AUTH_USER_NAME || "");
+    const [password, setPassword] = useState(process.env.NEXT_PUBLIC_AUTH_PASSWORD || "");
     const [login, setLogin] = useState(false);
     const dispatch = useDispatch();
 
