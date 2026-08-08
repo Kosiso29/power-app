@@ -8,7 +8,7 @@ import 'react-toastify/dist/ReactToastify.css';
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-    title: "Power App",
+    title: "Cyberwatt",
     description: "App for tracking power usage",
 };
 

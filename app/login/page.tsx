@@ -52,7 +52,7 @@ export default function Login() {
             <div className="flex flex-col lg:flex-row-reverse w-full h-full lg:h-3/4 lg:w-[90%] xl:w-3/4 shadow-2xl">
                 <div className="flex justify-center items-center basis-[49%] h-full bg-[#202474] bg-no-repeat bg-cover bg-center sign-in-right">
                     <div className="text-white p-5">
-                        <h1 className="text-4xl sm:text-6xl font-bold mb-10">Powersync</h1>
+                        <h1 className="text-4xl sm:text-6xl font-bold mb-10">Cyberwatt</h1>
                         <p className="text-md sm:text-lg">Power well managed is power well used. <br />Allow us to manage your power!</p>
                     </div>
                 </div>
