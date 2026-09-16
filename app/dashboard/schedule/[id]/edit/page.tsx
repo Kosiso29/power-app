@@ -15,9 +15,9 @@ import {
 import { toast } from 'react-toastify';
 import Loading from "@/app/components/loading";
 import Form from "@/app/components/form";
-import { getCookieByNameEndsWith } from "@/app/utils/getCookies";
 import axios from "axios";
 import 'react-toastify/dist/ReactToastify.css';
+import { getAuthIdToken } from "@/app/utils/authSession";
 
 export default function Page({ params }: { params: { id: string } }) {
     const [schedule, setSchedule] = useState(null);
@@ -41,8 +41,11 @@ export default function Page({ params }: { params: { id: string } }) {
     }
 
     useEffect(() => {
-        const idToken: any = getCookieByNameEndsWith('idToken');
-        getData(idToken);
+        const idToken = getAuthIdToken();
+
+        if (idToken) {
+            getData(idToken);
+        }
     }, [params.id]);
 
     return (

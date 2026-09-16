@@ -1,8 +1,31 @@
 import Button from "./ui/button";
 import Link from 'next/link';
 import Image from "next/image";
+import { redirect } from "next/navigation";
 
-export default function Home() {
+export default function Home({ searchParams }: { searchParams?: { code?: string, state?: string, error?: string, error_description?: string } }) {
+    if (searchParams?.code || searchParams?.error) {
+        const params = new URLSearchParams();
+
+        if (searchParams.code) {
+            params.set("code", searchParams.code);
+        }
+
+        if (searchParams.state) {
+            params.set("state", searchParams.state);
+        }
+
+        if (searchParams.error) {
+            params.set("error", searchParams.error);
+        }
+
+        if (searchParams.error_description) {
+            params.set("error_description", searchParams.error_description);
+        }
+
+        redirect(`/api/auth/callback?${params.toString()}`);
+    }
+
     return (
         <div className="bg-[#080c1c] lg:bg-[url('/cyberwatt-background.jpeg')] bg-center h-screen lg:flex lg:justify-end">
             <div className="lg:hidden max-h-[60vh] h-[60vh]">

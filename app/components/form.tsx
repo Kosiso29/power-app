@@ -13,10 +13,10 @@ import {
 } from '@heroicons/react/24/outline';
 import { toast } from 'react-toastify';
 import Loading from "@/app/components/loading";
-import { getCookieByNameEndsWith } from "@/app/utils/getCookies";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import 'react-toastify/dist/ReactToastify.css';
+import { getAuthIdToken } from "@/app/utils/authSession";
 
 const switches = ['SW1', 'SW2', 'SW3', 'SW4']
 
@@ -27,7 +27,6 @@ export default function Form({ schedule }: { schedule?: any }) {
     const deviceId = useSelector(state => state.authReducer.deviceId);
 
     const postData = async (apiData: any, idToken) => {
-        console.log('idToken', idToken);
         await new Promise((resolve, reject) => {
             axios.post('https://5jl4i1e6j7.execute-api.eu-west-3.amazonaws.com/dev', { ...apiData }, {
                 headers: {
@@ -87,7 +86,12 @@ export default function Form({ schedule }: { schedule?: any }) {
             from: Number(formDataObject.from.replace(':', '')),
             to: Number(formDataObject.to.replace(':', ''))
         }
-        const idToken: any = getCookieByNameEndsWith('idToken');
+        const idToken = getAuthIdToken();
+
+        if (!idToken) {
+            toast.error('Session expired. Please sign in again.');
+            return;
+        }
 
         if (schedule) {
             await patchData(apiData, idToken);

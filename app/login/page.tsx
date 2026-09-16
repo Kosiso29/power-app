@@ -1,51 +1,28 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-// @ts-nocheck
-
 'use client'
 
-import Image from "next/image";
 import Button from "../ui/button";
-import TextInput from "../ui/text-input";
 import { useEffect, useState } from "react";
-import Amplify, { Auth } from "aws-amplify";
-import { AwsConfigAuth } from "../config/auth";
-import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
-import { useDispatch } from "react-redux";
-import { authActions } from "@/app/store/auth";
-
-Amplify.configure({ Auth: AwsConfigAuth });
 
 export default function Login() {
-    const [email, setEmail] = useState(process.env.NEXT_PUBLIC_AUTH_USER_NAME || "");
-    const [password, setPassword] = useState(process.env.NEXT_PUBLIC_AUTH_PASSWORD || "");
-    const [login, setLogin] = useState(false);
-    const dispatch = useDispatch();
+    const [loading, setLoading] = useState(false);
 
-    const router = useRouter();
-
-    const signIn = async () => {
-        try {
-            const user = await Auth.signIn(email, password);
-            console.log('user', user);
-            if (user?.username) {
-                toast.success('Login successful!');
-                dispatch(authActions.updateToken(user.signInUserSession.idToken.jwtToken));
-                dispatch(authActions.updateDeviceId(user.username));
-                router.push('/dashboard');
-            } else {
-                toast.error('Login failed! User not found');
-            }
-        } catch (error) {
-            toast.error(`Login failed: ${error?.message || error}`);
+    const signIn = () => {
+        if (loading) {
+            return;
         }
+
+        setLoading(true);
+        window.location.href = '/api/auth/login';
     }
 
     useEffect(() => {
-        if (login) {
-            signIn();
+        const error = new URLSearchParams(window.location.search).get('error');
+
+        if (error) {
+            toast.error(`Login failed: ${error}`);
         }
-    }, [login])
+    }, []);
 
     return (
         <main className="flex justify-center items-center h-screen sign-in-background">
@@ -58,21 +35,14 @@ export default function Login() {
                 </div>
                 <div className="bg-[white] md:basis-[51%] h-full w-full flex justify-center items-center">
                     <div className="flex flex-col gap-10 w-3/4">
-                        {/* <Image
-                            src="/sign-in-background.jpeg"
-                            width={100}
-                            height={100}
-                            className="m-auto rounded-[50%]"
-                            alt="logo"
-                        /> */}
                         <h1 className="text-2xl font-bold">Sign in</h1>
-                        <TextInput type="email" value={email} placeholder="Email" onChange={setEmail} />
-                        <TextInput type="password" value={password} placeholder="Password" onChange={setPassword} />
-                        <div>
-                            <input id="RememberMe" className="cursor-pointer" type="checkbox" />
-                            <label htmlFor="RememberMe" className="ml-3 cursor-pointer">Remember me</label>
-                        </div>
-                        <Button onClick={() => setLogin(true)} className="bg-primary">Login</Button>
+                        <Button
+                            onClick={signIn}
+                            disabled={loading}
+                            className="bg-primary disabled:cursor-not-allowed disabled:opacity-70"
+                        >
+                            {loading ? 'Redirecting...' : 'Continue with AWS'}
+                        </Button>
                     </div>
                 </div>
             </div>

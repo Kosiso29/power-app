@@ -12,10 +12,10 @@ import Appliance from "./appliance";
 import Loading from "@/app/components/loading";
 import YesNo from "./yesno";
 import { toast } from 'react-toastify';
-import { getCookieByNameEndsWith } from "@/app/utils/getCookies";
 import { useSelector } from "react-redux";
 import 'react-toastify/dist/ReactToastify.css';
 import { useState, useEffect } from 'react';
+import { getAuthIdToken } from "@/app/utils/authSession";
 
 const daysMap = {
     "Monday": "M",
@@ -61,7 +61,13 @@ export default function Table({ schedules }) {
 
     useEffect(() => {
         if (answer === "yes") {
-            const idToken: any = getCookieByNameEndsWith('idToken');
+            const idToken = getAuthIdToken();
+
+            if (!idToken) {
+                toast.error('Session expired. Please sign in again.');
+                return;
+            }
+
             setLoading(true);
             deleteData(idToken);
         }

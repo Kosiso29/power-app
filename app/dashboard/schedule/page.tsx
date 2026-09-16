@@ -8,11 +8,11 @@ import PrimaryButton from "../../ui/button";
 import Table from "../../components/table";
 import Search from "../../components/search";
 import { useEffect, useState } from "react";
-import { getCookieByNameEndsWith } from "@/app/utils/getCookies";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { schedulesActions } from "@/app/store/schedules";
 import { useSelector } from "react-redux";
+import { getAuthIdToken } from "@/app/utils/authSession";
 
 export default function Schedule() {
     const [schedules, setSchedules] = useState([]);
@@ -39,9 +39,12 @@ export default function Schedule() {
     }, [schedules, dispatch])
 
     useEffect(() => {
-        const idToken = getCookieByNameEndsWith('idToken');
-        getData(idToken);
-    }, []);
+        const idToken = getAuthIdToken();
+
+        if (idToken && deviceId) {
+            getData(idToken);
+        }
+    }, [deviceId]);
 
     return (
         <div>

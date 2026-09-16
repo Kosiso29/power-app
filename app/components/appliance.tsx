@@ -3,63 +3,60 @@ import React, { useEffect, useState } from 'react'
 import { LightBulbIcon } from "@heroicons/react/24/outline";
 import Loading from "@/app/components/loading";
 import { toast } from 'react-toastify';
-import { getCookieByNameEndsWith } from "@/app/utils/getCookies";
-import { useSelector } from "react-redux";
 import axios from "axios";
 
-export default function Appliance({ initialShow = false, text, size = 40, defaultShow, className, switchNumber }: { initialShow?: boolean, text: string, size?: string | number, defaultShow?: boolean, className?: string, switchNumber?: string }) {
+const relayBySwitchNumber: Record<string, string> = { "1": "relay1", "2": "relay2", "17": "relay1", "22": "relay2" };
+
+export default function Appliance({ initialShow = false, text, size = 40, defaultShow, className, switchNumber, onStateChange }: { initialShow?: boolean, text: string, size?: string | number, defaultShow?: boolean, className?: string, switchNumber?: string, onStateChange?: (state: boolean) => void }) {
     const [show, setShow] = useState(initialShow);
     const [loading, setLoading] = useState(true);
     const [switchClicked, setSwitchClicked] = useState(false);
     const [alias, setAlias] = useState("");
-    const deviceId = useSelector((state: any) => state.authReducer.deviceId);
 
-    const getData = async (idToken: string) => {
-        await new Promise((resolve, reject) => {
-            axios.get(`https://yjvfp0vdp2.execute-api.eu-west-3.amazonaws.com/dev/${deviceId}?switch_name=SW${switchNumber}`, {
-                headers: {
-                    'Authorization': `${idToken}`
-                }
-            })
-                .then(response => response.data)
-                .then(data => {
-                    setAlias(data?.switch_alias)
-                    setLoading(false);
-                    setShow(data?.current_state);
-                    resolve(data);
-                })
-                .catch((error) => {
-                    setLoading(false);
-                    toast.error(`SW${text.replace("SW", "")} error: ` + error?.data || error);
-                });
-        })
+    const getRelayName = () => {
+        if (!switchNumber) {
+            return null;
+        }
+
+        return relayBySwitchNumber[switchNumber] || null;
     }
 
-    const postData = async (idToken: string) => {
-        const apiData = {
-            "device_id": deviceId,
-            "switch_name": `SW${switchNumber}`,
-            "switch_alias": alias,
-            "current_state": show ? 0 : 1
+    const postData = async () => {
+        const relayName = getRelayName();
+
+        if (!relayName) {
+            setLoading(false);
+            setSwitchClicked(false);
+            toast.error(`${text} is not connected to the relay API`);
+            return;
         }
+
+        const nextState = !show;
+        const apiData = {
+            [relayName]: nextState,
+        };
+
         await new Promise((resolve, reject) => {
-            axios.put(`https://yjvfp0vdp2.execute-api.eu-west-3.amazonaws.com/dev/${deviceId}?switch_name=SW${switchNumber}`, apiData, {
+            axios.post('/api/switch', apiData, {
                 headers: {
-                    'Authorization': `${idToken}`
+                    'Content-Type': 'application/json',
                 }
             })
                 .then(response => response.data)
                 .then(data => {
+                    const returnedState = typeof data?.[relayName] === "boolean" ? data[relayName] : nextState;
+
                     setLoading(false);
                     setSwitchClicked(false);
-                    setShow(prevState => !prevState);
-                    toast.success(`${text} triggered: ` + data);
+                    setShow(returnedState);
+                    onStateChange?.(returnedState);
+                    toast.success(`${alias || text} turned ${returnedState ? 'on' : 'off'}`);
                     resolve(data);
                 })
                 .catch((error) => {
                     setLoading(false);
                     setSwitchClicked(false);
-                    toast.error(`${text} error: ` + error?.data || error);
+                    toast.error(`${alias || text} error: ${error?.response?.data?.error || error?.response?.data?.message || error?.message || error}`);
                 });
         })
     }
@@ -74,20 +71,25 @@ export default function Appliance({ initialShow = false, text, size = 40, defaul
     }
 
     useEffect(() => {
-        const idToken: any = getCookieByNameEndsWith('idToken');
         if (switchClicked) {
-            postData(idToken);
+            postData();
         }
     }, [switchClicked, switchNumber])
 
     useEffect(() => {
-        const idToken: any = getCookieByNameEndsWith('idToken');
         if (switchNumber) {
-            getData(idToken);
+            setAlias(`Relay ${switchNumber}`);
+            setLoading(false);
         } else {
             setLoading(false);
         }
     }, [switchNumber])
+
+    useEffect(() => {
+        if (defaultShow === undefined) {
+            setShow(initialShow);
+        }
+    }, [initialShow, defaultShow])
 
     return (
         <div className='flex flex-col justify-center items-center'>

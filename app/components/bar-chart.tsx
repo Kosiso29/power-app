@@ -4,7 +4,31 @@ import { useEffect, useState } from 'react';
 
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
+const colors = ['#5a7edc', '#4ebd95', '#f3a953'];
+
+function normalizeChartData(dailyConsumption) {
+    if (Array.isArray(dailyConsumption?.series)) {
+        return {
+            categories: dailyConsumption.categories || [],
+            series: dailyConsumption.series.map((series, index) => ({
+                ...series,
+                color: colors[index % colors.length],
+            })),
+        };
+    }
+
+    return {
+        categories: Object.keys(dailyConsumption || {}),
+        series: [{
+            name: 'Raw sensor total',
+            data: Object.values(dailyConsumption || {}),
+            color: colors[0],
+        }],
+    };
+}
+
 export default function BarChart({ dailyConsumption = {} }) {
+    const chartData = normalizeChartData(dailyConsumption);
     const [barChartOptions, setBarChartOptions] = useState({
         chart: {
             id: 'BarChart',
@@ -13,8 +37,20 @@ export default function BarChart({ dailyConsumption = {} }) {
             },
             foreColor: '#AAAAAA'
         },
+        dataLabels: {
+            enabled: false
+        },
+        legend: {
+            show: true,
+            position: 'top'
+        },
         xaxis: {
-            categories: Object.keys(dailyConsumption)
+            categories: chartData.categories
+        },
+        yaxis: {
+            labels: {
+                formatter: (value) => Math.round(value).toString()
+            }
         },
         fill: {
             type: 'gradient',
@@ -25,26 +61,23 @@ export default function BarChart({ dailyConsumption = {} }) {
         }
     })
     const [barChartSeries, setBarChartSeries] = useState([{
-        name: 'series-1',
-        data: Object.values(dailyConsumption),
-        color: '#5a7edc'
+        name: chartData.series[0]?.name || 'Sensor',
+        data: chartData.series[0]?.data || [],
+        color: chartData.series[0]?.color || colors[0]
     }]);
     
     useEffect(() => {
+        const nextChartData = normalizeChartData(dailyConsumption);
+
         setBarChartOptions(prevState => {
             return {
                 ...prevState,
                 xaxis: {
-                    categories: Object.keys(dailyConsumption)
+                    categories: nextChartData.categories
                 }
             }
         });
-        setBarChartSeries(prevState => {
-            return [{
-                ...prevState[0],
-                data: Object.values(dailyConsumption),
-            }]
-        })
+        setBarChartSeries(nextChartData.series)
     }, [dailyConsumption]);
 
     return (
