@@ -15,7 +15,7 @@ export default function Logout() {
 
         if (!idToken) {
             toast.error('Authentication failed! Token not found');
-            router.push('/');
+            router.replace('/login');
         }
     }
 

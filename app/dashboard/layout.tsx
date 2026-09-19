@@ -1,7 +1,13 @@
 import React from 'react';
 import Sidebar from "../components/sidebar";
+import { redirect } from "next/navigation";
+import { hasActiveSession } from "../utils/serverAuth";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
+    if (!hasActiveSession()) {
+        redirect("/login");
+    }
+
     return (
         <div className='max-w-full h-screen'>
             <Sidebar />

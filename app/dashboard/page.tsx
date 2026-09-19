@@ -183,7 +183,12 @@ export default function Dashboard() {
     useEffect(() => {
         if (!telemetryLoaded.current) {
             telemetryLoaded.current = true;
-            getData().catch(() => {
+            getData().catch((error) => {
+                if (error?.response?.status === 401) {
+                    window.location.replace('/api/auth/logout');
+                    return;
+                }
+
                 telemetryLoaded.current = false;
                 setSwitchStates({ SW1: false, SW2: false });
                 toast.error('Unable to load dashboard data');
