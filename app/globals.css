@@ -4,6 +4,13 @@
 
 :root {
     --sidebar-width: 7rem;
+    --brand-navy: #0a0f1f;
+    --brand-blue: #2563eb;
+    --brand-cyan: #06b6d4;
+    --brand-lime: #84cc16;
+    --brand-surface: #f8fafc;
+    --brand-muted: #64748b;
+    --brand-line: rgba(15, 23, 42, 0.12);
 }
 
 * {
@@ -13,6 +20,155 @@
 body {
     margin: 0;
     padding: 0;
+    color: var(--brand-navy);
+    background: var(--brand-surface);
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+::selection {
+    color: white;
+    background: var(--brand-blue);
+}
+
+.brand-panel {
+    border: 1px solid var(--brand-line);
+    border-radius: 8px;
+    background: white;
+    box-shadow: 0 14px 36px rgba(10, 15, 31, 0.06);
+}
+
+.brand-action {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 40px;
+    padding: 0 20px;
+    border: 1px solid rgba(6, 182, 212, 0.55);
+    border-radius: 8px;
+    color: #0a0f1f;
+    background: rgba(37, 99, 235, 0.07);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85), 0 0 26px rgba(6, 182, 212, 0.14), 0 12px 28px rgba(37, 99, 235, 0.1);
+    -webkit-backdrop-filter: blur(8px) saturate(118%);
+    backdrop-filter: blur(8px) saturate(118%);
+    font-size: 0.95rem;
+    font-weight: 900;
+    line-height: 1.2;
+    overflow: hidden;
+    transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.brand-action::before {
+    position: absolute;
+    inset: 0;
+    padding: 1px;
+    border-radius: inherit;
+    content: "";
+    pointer-events: none;
+    background: linear-gradient(135deg, transparent 34%, rgba(6, 182, 212, 0.12) 42%, rgba(255, 255, 255, 0.95) 49%, rgba(132, 204, 22, 0.2) 55%, transparent 68%);
+    background-position: 100% 100%;
+    background-size: 230% 230%;
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    mask-composite: exclude;
+    animation: brand-action-shine 9s ease-in-out infinite;
+}
+
+.brand-action:hover:not(:disabled) {
+    transform: translateY(-2px);
+    border-color: rgba(37, 99, 235, 0.7);
+    box-shadow: inset 0 1px 0 #fff, 0 18px 40px rgba(37, 99, 235, 0.18), 0 0 24px rgba(6, 182, 212, 0.16);
+}
+
+.brand-action:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.brand-action:focus-visible,
+.brand-action-secondary:focus-visible {
+    outline: 2px solid var(--brand-cyan);
+    outline-offset: 2px;
+}
+
+.brand-action:disabled {
+    cursor: not-allowed;
+    opacity: 0.65;
+}
+
+.brand-action-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    padding: 0 20px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    color: var(--brand-navy);
+    background: #fff;
+    font-size: 0.95rem;
+    font-weight: 800;
+    transition: border-color 180ms ease, background-color 180ms ease;
+}
+
+.brand-action-secondary:hover {
+    border-color: var(--brand-cyan);
+    background: #f0f9ff;
+}
+
+@keyframes brand-action-shine {
+    0%, 35%, 100% { background-position: 100% 100%; opacity: 0; }
+    48%, 62% { opacity: 0.9; }
+    75% { background-position: 0 0; opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .brand-action::before { animation: none; }
+}
+
+.brand-wordmark {
+    display: inline-flex;
+    align-items: center;
+    color: #f8fafc;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 900;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.brand-wordmark span:last-child {
+    color: var(--brand-blue);
+}
+
+.brand-wordmark-header {
+    min-height: 38px;
+    padding-left: 15px;
+    border-left: 1px solid rgba(248, 250, 252, 0.62);
+    font-size: 1.52rem;
+}
+
+.brand-wordmark-sidebar {
+    font-size: 1rem;
+}
+
+main input:not([type="checkbox"]):not([type="radio"]),
+main select {
+    color: var(--brand-navy);
+    border-color: #e2e8f0;
+    background-color: #ffffff;
+    outline: none;
+}
+
+main input:not([type="checkbox"]):not([type="radio"]):focus,
+main select:focus {
+    border-color: var(--brand-cyan);
+    box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.12);
+}
+
+main input[type="checkbox"],
+main input[type="radio"] {
+    accent-color: var(--brand-blue);
 }
 
 .switch {
@@ -55,11 +211,11 @@ body {
 }
 
 input:checked+.slider {
-    background-color: #3b65d5;
+    background-color: var(--brand-cyan);
 }
 
 input:focus+.slider {
-    box-shadow: 0 0 1px #3b65d5;
+    box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.2);
 }
 
 input:checked+.slider:before {
@@ -91,11 +247,90 @@ input:checked+.slider:before {
 }
 
 .sign-in-background {
-    background-image: linear-gradient(to right, #3b65d5 50%, #EEF 50%)
+    background: var(--brand-navy);
 }
 
 .sign-in-right {
-    background-image: linear-gradient(to bottom right, #7d8cbf 1%, #202474, #202474)
+    background: #0a0f1f;
+}
+
+.sign-in-form {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    border-top: 1px solid rgba(6, 182, 212, 0.35);
+    background:
+        linear-gradient(155deg, rgba(6, 182, 212, 0.2) 0%, transparent 32%),
+        linear-gradient(325deg, rgba(37, 99, 235, 0.3) 0%, transparent 42%),
+        linear-gradient(135deg, #07111f 0%, #0a0f1f 54%, #071827 100%);
+}
+
+.sign-in-form::before,
+.sign-in-form::after {
+    position: absolute;
+    right: -20%;
+    bottom: 0;
+    z-index: -1;
+    width: min(90vw, 680px);
+    aspect-ratio: 1;
+    content: "";
+    pointer-events: none;
+    transform: translate(5%, 55%);
+    -webkit-mask: url("/cyberwatt-logo.png") center / contain no-repeat;
+    mask: url("/cyberwatt-logo.png") center / contain no-repeat;
+}
+
+.sign-in-form::before {
+    background: rgba(37, 99, 235, 0.06);
+    filter: drop-shadow(0 0 30px rgba(37, 99, 235, 0.035));
+}
+
+.sign-in-form::after {
+    background: linear-gradient(180deg, rgba(248, 250, 252, 0.38), var(--brand-blue) 42%, rgba(6, 182, 212, 0.32));
+    clip-path: inset(8% 39% 44% 39%);
+    opacity: 0;
+    animation: sign-in-logo-glint 14s ease-in-out infinite;
+}
+
+@keyframes sign-in-logo-glint {
+    0%, 28%, 34%, 100% {
+        opacity: 0;
+        filter: drop-shadow(0 0 8px rgba(37, 99, 235, 0.04));
+    }
+    29% { opacity: 0.03; }
+    30% {
+        opacity: 0.13;
+        filter: drop-shadow(0 0 5px rgba(248, 250, 252, 0.06)) drop-shadow(0 0 9px rgba(103, 232, 249, 0.12));
+    }
+    31% { opacity: 0.02; }
+    32% {
+        opacity: 0.09;
+        filter: drop-shadow(0 0 8px rgba(103, 232, 249, 0.1));
+    }
+    33% { opacity: 0.03; }
+}
+
+.sign-in-action {
+    border-color: rgba(6, 182, 212, 0.68);
+    color: #e0f2fe;
+    background: rgba(37, 99, 235, 0.12);
+    box-shadow: inset 0 1px 0 rgba(248, 250, 252, 0.16), 0 0 26px rgba(6, 182, 212, 0.16), 0 18px 46px rgba(37, 99, 235, 0.12);
+}
+
+.sign-in-action:hover:not(:disabled) {
+    border-color: rgba(248, 250, 252, 0.65);
+    background: rgba(37, 99, 235, 0.2);
+    box-shadow: inset 0 1px 0 rgba(248, 250, 252, 0.25), 0 20px 52px rgba(37, 99, 235, 0.18), 0 0 24px rgba(6, 182, 212, 0.2);
+}
+
+@media (min-width: 1024px) {
+    .sign-in-form { border-top: 0; border-left: 1px solid rgba(6, 182, 212, 0.35); }
+    .sign-in-form::before,
+    .sign-in-form::after { right: -24%; width: min(64vw, 760px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .sign-in-form::after { animation: none; }
 }
 
 @layer utilities {

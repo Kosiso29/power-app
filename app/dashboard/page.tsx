@@ -204,28 +204,35 @@ export default function Dashboard() {
     };
 
     return (
-        <div>
-            <h1 className='text-4xl text-primary'>
-                Cyberwatt
-            </h1>
-            <div className="flex flex-col 2lg:flex-row justify-between w-full mt-16 gap-12">
-                <div className='2lg:basis-[45%] bg-white rounded-lg p-5 min-h-48'>
-                    <h2 className='text-gray-500'>Latest Sensor Readings</h2>
+        <div className="mx-auto max-w-[1440px]">
+            <div>
+                <p className="text-xs font-black uppercase text-brand-cyan">Energy overview</p>
+                <h1 className='mt-2 text-3xl font-black text-brand-navy sm:text-4xl'>Cyberwatt dashboard</h1>
+                <p className="mt-2 text-sm text-slate-500">Live device readings and relay control.</p>
+            </div>
+            <div className="mt-10 grid w-full gap-6 xl:grid-cols-2">
+                <section className='brand-panel min-h-48 p-5 sm:p-6'>
+                    <h2 className='font-bold text-brand-navy'>Latest Sensor Readings</h2>
+                    <p className="mt-1 text-xs text-slate-500">Most recent raw ADC values</p>
                     <div className="flex justify-center flex-wrap md:flex-nowrap md:justify-between">
                         <div className="flex flex-col items-center">
                             <PieChart availablePower={availablePower} />
                         </div>
                         <VerticalBarChart totalPowerBySwitches={totalPowerBySwitches} />
                     </div>
-                </div>
-                <div className='2lg:basis-[45%] bg-white rounded-lg p-5 min-h-48'>
-                    <h2 className='text-gray-500'>Recent Sensor Activity</h2>
+                </section>
+                <section className='brand-panel min-h-48 p-5 sm:p-6'>
+                    <h2 className='font-bold text-brand-navy'>Recent Sensor Activity</h2>
+                    <p className="mt-1 text-xs text-slate-500">Latest readings over time</p>
                     <BarChart dailyConsumption={dailyConsumption} />
-                </div>
+                </section>
             </div>
-            <div className='bg-white w-full mt-16 rounded-lg md:p-12 py-12 px-2 h-auto'>
-                <div className="flex justify-between h-auto">
-                    <div className='flex justify-evenly text-gray-400 flex-wrap gap-[15%] basis-[50%] items-center pr-[5%]'>
+            <section className='brand-panel mt-6 h-auto w-full px-5 py-8 sm:p-8'>
+                <div className="grid h-auto gap-8 lg:grid-cols-2">
+                    <div>
+                        <h2 className="font-bold text-brand-navy">Relay controls</h2>
+                        <p className="mt-1 text-xs text-slate-500">Switch connected circuits on or off</p>
+                        <div className='mt-8 flex flex-wrap items-center gap-10 text-slate-500'>
                         {
                             switchStates === null ? <Loading /> : switchControls.map(item => (
                                 <Appliance
@@ -237,11 +244,12 @@ export default function Dashboard() {
                                 />
                             ))
                         }
+                        </div>
                     </div>
-                    <div className='text-gray-500 gap-[30%] border-l-2 border-gray-300 items-center basis-[50%]'>
-                        <h1 className='text-xl text-primary pb-8 pl-[10%]'>Insights</h1>
-                        <hr className='h-[2px] bg-gray-300 w-[80%] ml-[7%]' />
-                        <div className="flex flex-wrap text-gray-400 gap-2 pl-[14%] mt-5">
+                    <div className='border-t border-slate-200 pt-8 text-slate-500 lg:border-l lg:border-t-0 lg:pl-8 lg:pt-0'>
+                        <h2 className='font-bold text-brand-navy'>Insights</h2>
+                        <p className="mt-1 text-xs text-slate-500">Recommended actions from your device data</p>
+                        <div className="mt-5 flex flex-wrap gap-2 text-slate-400">
                             {
                                 switchesToTurnOff.filter(item => mapSwitchToRelay[item]).map(item => (
                                     <Appliance
@@ -254,7 +262,7 @@ export default function Dashboard() {
                                 ))
                             }
                         </div>
-                        <ul className='h-60 flex flex-col gap-5 px-7 sm:px-[10%]'>
+                        <ul className='mt-6 flex min-h-40 flex-col gap-5 pl-5'>
                             {
                                 recommendedActions.map(item => (
                                     <li key={item} className='text-gray-500 list-disc marker:text-primary marker:text-xl py-1'>{item.replace("SW2", "ACs & Heaters").replace("SW4", "Wall Sucket")}</li>
@@ -263,7 +271,7 @@ export default function Dashboard() {
                         </ul>
                     </div>
                 </div>
-            </div>
+            </section>
         </div>
     )
 }

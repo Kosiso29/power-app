@@ -30,7 +30,7 @@ export default function Logout() {
 
     return (
         <NavLink href="#" onClick={handleLogout}>
-            <ArrowLeftEndOnRectangleIcon color='rgba(210, 210, 210, .4)' width={50} height={50} />
+            <ArrowLeftEndOnRectangleIcon className="h-6 w-6" />
         </NavLink>
     )
 }

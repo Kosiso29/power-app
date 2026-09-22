@@ -9,6 +9,9 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ["Arial", "Helvetica", "sans-serif"],
+      },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
         "gradient-conic":
@@ -16,9 +19,13 @@ const config: Config = {
         "signin-hero": "url('/single-bulb.jpeg')",
       },
       colors: {
-        'primary': '#3b65d5',
-        'primary-hover': '#2953c1',
-        'primary-active': '#2449aa',
+        'primary': '#2563EB',
+        'primary-hover': '#1D4ED8',
+        'primary-active': '#1E40AF',
+        'brand-navy': '#0A0F1F',
+        'brand-cyan': '#06B6D4',
+        'brand-lime': '#84CC16',
+        'brand-surface': '#F8FAFC',
         'secondary': '#FFFFFF'
       }
       },

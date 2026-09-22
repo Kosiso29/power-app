@@ -15,7 +15,7 @@ export default function VerticalBarChart({ totalPowerBySwitches }) {
             toolbar: {
                 show: false
             },
-            foreColor: '#AAAAAA',
+            foreColor: '#64748B',
             dataLabels: {
                 enabled: false
             },
@@ -25,9 +25,11 @@ export default function VerticalBarChart({ totalPowerBySwitches }) {
         },
         plotOptions: {
             bar: {
-                horizontal: true
+                horizontal: true,
+                borderRadius: 4
             }
         },
+        grid: { borderColor: 'rgba(15, 23, 42, 0.08)' },
         xaxis: {
             categories: sortedSwitches,
             labels: {
@@ -45,7 +47,7 @@ export default function VerticalBarChart({ totalPowerBySwitches }) {
     const [verticalBarChartSeries, setVerticalBarChartSeries] = useState([{
         name: 'series-1',
         data: sortedPower,
-        color: '#5a7edc'
+        color: '#06B6D4'
     }])
 
     useEffect(() => {

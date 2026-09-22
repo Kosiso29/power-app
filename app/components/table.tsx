@@ -80,12 +80,12 @@ export default function Table({ schedules }) {
     return (
         <div className="flow-root max-w-full">
             <div className="inline-block min-w-full align-middle max-w-full">
-                <div className="rounded-lg bg-gray-100 p-2 max-w-full">
+                <div className="max-w-full rounded-lg border border-slate-200 bg-slate-50 p-2">
                     <div className="lg:hidden">
                         {schedules?.map((schedule) => (
                             <div
                                 key={schedule.id}
-                                className="mb-2 w-full rounded-md bg-white p-4"
+                                className="mb-2 w-full rounded-lg border border-slate-200 bg-white p-4"
                             >
                                 <div className="flex flex-wrap items-center justify-between border-b pb-4 gap-4">
                                     <div>
@@ -100,12 +100,12 @@ export default function Table({ schedules }) {
                                                 {
                                                     schedule.status === 'active' ?
                                                         <span
-                                                            className="w-fit flex cursor-pointer items-center gap-1.5 rounded-full bg-primary px-3 py-1.5 text-xs font-medium text-white"
+                                                            className="flex w-fit items-center gap-1.5 rounded-md bg-brand-lime px-3 py-1.5 text-xs font-bold text-brand-navy"
                                                         >
                                                             {schedule.status}
                                                         </span> :
                                                         <span
-                                                            className="w-fit flex cursor-pointer items-center gap-1.5 rounded-full bg-gray-400 px-3 py-1.5 text-xs font-medium text-white"
+                                                            className="flex w-fit items-center gap-1.5 rounded-md bg-slate-300 px-3 py-1.5 text-xs font-bold text-slate-700"
                                                         >
                                                             {schedule.status}
                                                         </span>
@@ -210,12 +210,12 @@ export default function Table({ schedules }) {
                                         {
                                             schedule.status === 'active' ?
                                                 <span
-                                                    className="w-fit flex cursor-pointer items-center gap-1.5 rounded-full bg-primary px-3 py-1.5 text-xs font-medium text-white"
+                                                className="flex w-fit items-center gap-1.5 rounded-md bg-brand-lime px-3 py-1.5 text-xs font-bold text-brand-navy"
                                                 >
                                                     {schedule.status}
                                                 </span> :
                                                 <span
-                                                    className="w-fit flex cursor-pointer items-center gap-1.5 rounded-full bg-gray-400 px-3 py-1.5 text-xs font-medium text-white"
+                                                className="flex w-fit items-center gap-1.5 rounded-md bg-slate-300 px-3 py-1.5 text-xs font-bold text-slate-700"
                                                 >
                                                     {schedule.status}
                                                 </span>

@@ -9,11 +9,12 @@ export default function PieChart({ availablePower }) {
     const [pieChartAvailablePower, setPieChartAvailablePower] = useState([availablePower])
 
     const [pieChartOptions, setPieChartOptions] = useState({
-        chart: {
-            id: 'PieChart'
-        },
         labels: ["Available Power"],
-        colors: ['#5a7edc'],
+        colors: ['#2563EB'],
+        chart: {
+            id: 'PieChart',
+            foreColor: '#64748B'
+        },
         fill: {
             type: 'gradient',
             gradient: {
@@ -26,7 +27,7 @@ export default function PieChart({ availablePower }) {
     const [pieChartSeries, setPieChartSeries] = useState([]);
 
     const updatePieChart = () => {
-        let colors = ['#5a7edc']
+        let colors = ['#2563EB']
         if (pieChartAvailablePower <= 20) {
             colors = ['#EE5577'];
         }

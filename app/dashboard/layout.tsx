@@ -9,11 +9,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     }
 
     return (
-        <div className='max-w-full h-screen'>
+        <div className='min-h-screen max-w-full bg-brand-surface'>
             <Sidebar />
-            <div className="max-w-full sm:ml-[length:var(--sidebar-width)] sm:w-[calc(100%-var(--sidebar-width))] px-5 py-10 sm:p-10 bg-[#EEF] min-h-screen">
+            <main className="min-h-screen max-w-full px-4 pb-28 pt-8 sm:ml-[length:var(--sidebar-width)] sm:w-[calc(100%-var(--sidebar-width))] sm:p-10 lg:p-12">
                 {children}
-            </div>
+            </main>
         </div>
     )
 }

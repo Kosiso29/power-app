@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
-const colors = ['#5a7edc', '#4ebd95', '#f3a953'];
+const colors = ['#2563EB', '#06B6D4', '#84CC16'];
 
 function normalizeChartData(dailyConsumption) {
     if (Array.isArray(dailyConsumption?.series)) {
@@ -35,15 +35,19 @@ export default function BarChart({ dailyConsumption = {} }) {
             toolbar: {
                 show: false
             },
-            foreColor: '#AAAAAA'
+            foreColor: '#64748B',
+            fontFamily: 'Arial, Helvetica, sans-serif'
         },
         dataLabels: {
             enabled: false
         },
         legend: {
             show: true,
-            position: 'top'
+            position: 'top',
+            horizontalAlign: 'left'
         },
+        grid: { borderColor: 'rgba(15, 23, 42, 0.08)' },
+        plotOptions: { bar: { borderRadius: 4, columnWidth: '54%' } },
         xaxis: {
             categories: chartData.categories
         },

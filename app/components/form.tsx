@@ -111,7 +111,7 @@ export default function Form({ schedule }: { schedule?: any }) {
 
     return (
         <form aria-describedby="form-error" action={getFormData}>
-            <div className="rounded-md bg-gray-100 p-4 md:p-6">
+            <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 text-brand-navy md:p-6">
                 {/* Schedule Type */}
                 <div className="mb-4">
                     <label htmlFor="scheduleType" className="mb-2 block text-sm font-medium">
@@ -172,7 +172,7 @@ export default function Form({ schedule }: { schedule?: any }) {
                                     <div key={item} className="flex items-center gap-2">
                                         <label
                                             htmlFor={item}
-                                            className="flex cursor-pointer items-center gap-1.5 rounded-full bg-primary px-3 py-1.5 text-xs font-medium text-white"
+                                            className="flex cursor-pointer items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-bold text-white"
                                         >
                                             {item}
                                         </label>
@@ -310,7 +310,7 @@ export default function Form({ schedule }: { schedule?: any }) {
                                 />
                                 <label
                                     htmlFor="status"
-                                    className="ml-2 flex cursor-pointer items-center gap-1.5 rounded-full bg-primary px-3 py-1.5 text-xs font-medium text-white"
+                                    className="ml-2 flex cursor-pointer items-center gap-1.5 rounded-md bg-brand-lime px-3 py-1.5 text-xs font-bold text-brand-navy"
                                 >
                                     active <CheckIcon className="h-4 w-4" />
                                 </label>
@@ -327,7 +327,7 @@ export default function Form({ schedule }: { schedule?: any }) {
                                 />
                                 <label
                                     htmlFor="status"
-                                    className="ml-2 flex cursor-pointer items-center gap-1.5 rounded-full bg-gray-400 px-3 py-1.5 text-xs font-medium text-white"
+                                    className="ml-2 flex cursor-pointer items-center gap-1.5 rounded-md bg-slate-300 px-3 py-1.5 text-xs font-bold text-slate-700"
                                 >
                                     inactive <XMarkIcon className="h-4 w-4" />
                                 </label>
@@ -348,7 +348,7 @@ export default function Form({ schedule }: { schedule?: any }) {
                                     <div key={item} className="flex items-center gap-2">
                                         <label
                                             htmlFor={item}
-                                            className="flex cursor-pointer items-center gap-1.5 rounded-full bg-primary px-3 py-1.5 text-xs font-medium text-white"
+                                            className="flex cursor-pointer items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-bold text-white"
                                         >
                                             {item}
                                         </label>
@@ -371,12 +371,12 @@ export default function Form({ schedule }: { schedule?: any }) {
             <div className="mt-6 flex justify-center md:justify-end gap-4">
                 <Link
                     href="/dashboard/schedule"
-                    className="flex h-10 items-center rounded-lg bg-gray-100 px-4 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200"
+                    className="brand-action-secondary"
                 >
                     Cancel
                 </Link>
                 <button
-                    className="flex h-10 items-center rounded-lg bg-blue-600 px-4 text-sm font-medium text-white transition-colors hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+                    className="brand-action"
                     onClick={() => setLoading(true)}
                 >
                     <span>{schedule ? "Update Schedule" : "Create Schedule"}</span>

@@ -1,16 +1,18 @@
 import React from 'react'
-import Button from "../../ui/button";
-import Link from "next/link";
+import { Cog6ToothIcon } from "@heroicons/react/24/outline";
 
 export default function Setting() {
     return (
-        <div className='flex flex-col justify-center items-center h-screen'>
-            <h1>
-                Setting
-            </h1>
-            <Link href="/">
-                <Button className="bg-primary">Logout</Button>
-            </Link>
+        <div className="mx-auto max-w-[1440px]">
+            <p className="text-xs font-black uppercase text-brand-cyan">Preferences</p>
+            <h1 className="mt-2 text-3xl font-black text-brand-navy sm:text-4xl">Settings</h1>
+            <div className="brand-panel mt-10 flex min-h-[420px] flex-col items-center justify-center px-6 text-center">
+                <div className="flex h-14 w-14 items-center justify-center rounded-full border border-cyan-200 bg-cyan-50 text-brand-cyan">
+                    <Cog6ToothIcon className="h-7 w-7" />
+                </div>
+                <h2 className="mt-5 text-lg font-bold text-brand-navy">No settings available</h2>
+                <p className="mt-2 max-w-sm text-sm leading-6 text-slate-500">Account and device preferences will appear here when available.</p>
+            </div>
         </div>
     )
 }
