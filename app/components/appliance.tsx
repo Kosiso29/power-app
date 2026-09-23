@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react'
-import { BoltIcon } from "@heroicons/react/24/outline";
+import Image from "next/image";
 import Loading from "@/app/components/loading";
 import { toast } from 'react-toastify';
 import axios from "axios";
@@ -12,6 +12,8 @@ export default function Appliance({ initialShow = false, text, size = 40, defaul
     const [loading, setLoading] = useState(true);
     const [switchClicked, setSwitchClicked] = useState(false);
     const [alias, setAlias] = useState("");
+    const baseIconSize = typeof size === "number" ? size : Number.parseInt(size, 10) || 40;
+    const iconSize = baseIconSize + 14;
 
     const getRelayName = () => {
         if (!switchNumber) {
@@ -96,7 +98,13 @@ export default function Appliance({ initialShow = false, text, size = 40, defaul
             <button type="button" onClick={handleClick} aria-label={`${show || defaultShow ? 'Turn off' : 'Turn on'} ${alias || text}`} className={`flex items-center justify-center rounded-full border p-3 transition-all ${show || defaultShow ? 'border-cyan-300 bg-brand-cyan text-brand-navy shadow-[0_0_24px_rgba(6,182,212,0.28)]' : 'border-slate-200 bg-slate-100 text-slate-400 hover:border-slate-300'} ${loading ? 'bg-transparent' : ''} ${className}`}>
                 {
                     loading ? <div className='flex justify-center items-center' style={{ width: size, height: size }}><Loading small /></div> :
-                        <BoltIcon width={size} height={size} />
+                        <Image
+                            src="/cyberwatt-logo.png"
+                            width={iconSize}
+                            height={iconSize}
+                            alt=""
+                            className="brightness-0"
+                        />
                 }
             </button>
             <span className='text-center text-sm font-semibold'>{loading ? alias || "---" : alias || text}</span>

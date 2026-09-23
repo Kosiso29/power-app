@@ -207,11 +207,11 @@ export default function Dashboard() {
         <div className="mx-auto max-w-[1440px]">
             <div>
                 <p className="text-xs font-black uppercase text-brand-cyan">Energy overview</p>
-                <h1 className='mt-2 text-3xl font-black text-brand-navy sm:text-4xl'>Cyberwatt dashboard</h1>
+                <h1 className='mt-1 text-3xl font-black text-brand-navy sm:text-4xl'>Cyberwatt dashboard</h1>
                 <p className="mt-2 text-sm text-slate-500">Live device readings and relay control.</p>
             </div>
-            <div className="mt-10 grid w-full gap-6 xl:grid-cols-2">
-                <section className='brand-panel min-h-48 p-5 sm:p-6'>
+            <div className="mt-7 grid w-full gap-4 xl:grid-cols-2">
+                <section className='brand-panel p-4 sm:p-5'>
                     <h2 className='font-bold text-brand-navy'>Latest Sensor Readings</h2>
                     <p className="mt-1 text-xs text-slate-500">Most recent raw ADC values</p>
                     <div className="flex justify-center flex-wrap md:flex-nowrap md:justify-between">
@@ -221,18 +221,18 @@ export default function Dashboard() {
                         <VerticalBarChart totalPowerBySwitches={totalPowerBySwitches} />
                     </div>
                 </section>
-                <section className='brand-panel min-h-48 p-5 sm:p-6'>
+                <section className='brand-panel p-4 sm:p-5'>
                     <h2 className='font-bold text-brand-navy'>Recent Sensor Activity</h2>
                     <p className="mt-1 text-xs text-slate-500">Latest readings over time</p>
                     <BarChart dailyConsumption={dailyConsumption} />
                 </section>
             </div>
-            <section className='brand-panel mt-6 h-auto w-full px-5 py-8 sm:p-8'>
-                <div className="grid h-auto gap-8 lg:grid-cols-2">
+            <section className='brand-panel mt-4 h-auto w-full p-4 sm:p-5'>
+                <div className="grid h-auto gap-5 lg:grid-cols-2">
                     <div>
                         <h2 className="font-bold text-brand-navy">Relay controls</h2>
                         <p className="mt-1 text-xs text-slate-500">Switch connected circuits on or off</p>
-                        <div className='mt-8 flex flex-wrap items-center gap-10 text-slate-500'>
+                        <div className='mt-5 flex flex-wrap items-center gap-7 text-slate-500'>
                         {
                             switchStates === null ? <Loading /> : switchControls.map(item => (
                                 <Appliance
@@ -246,7 +246,7 @@ export default function Dashboard() {
                         }
                         </div>
                     </div>
-                    <div className='border-t border-slate-200 pt-8 text-slate-500 lg:border-l lg:border-t-0 lg:pl-8 lg:pt-0'>
+                    <div className='border-t border-slate-200 pt-5 text-slate-500 lg:border-l lg:border-t-0 lg:pl-5 lg:pt-0'>
                         <h2 className='font-bold text-brand-navy'>Insights</h2>
                         <p className="mt-1 text-xs text-slate-500">Recommended actions from your device data</p>
                         <div className="mt-5 flex flex-wrap gap-2 text-slate-400">
@@ -262,7 +262,7 @@ export default function Dashboard() {
                                 ))
                             }
                         </div>
-                        <ul className='mt-6 flex min-h-40 flex-col gap-5 pl-5'>
+                        <ul className='mt-4 flex min-h-24 flex-col gap-3 pl-5'>
                             {
                                 recommendedActions.map(item => (
                                     <li key={item} className='text-gray-500 list-disc marker:text-primary marker:text-xl py-1'>{item.replace("SW2", "ACs & Heaters").replace("SW4", "Wall Sucket")}</li>

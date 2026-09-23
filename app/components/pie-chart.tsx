@@ -10,16 +10,58 @@ export default function PieChart({ availablePower }) {
 
     const [pieChartOptions, setPieChartOptions] = useState({
         labels: ["Available Power"],
-        colors: ['#2563EB'],
+        colors: ['#22D3EE'],
         chart: {
             id: 'PieChart',
-            foreColor: '#64748B'
+            foreColor: '#CBD5E1',
+            sparkline: {
+                enabled: false
+            }
+        },
+        stroke: {
+            lineCap: 'round'
+        },
+        plotOptions: {
+            radialBar: {
+                startAngle: -135,
+                endAngle: 135,
+                hollow: {
+                    size: '62%',
+                    background: 'rgba(7, 17, 31, 0.72)'
+                },
+                track: {
+                    background: '#102342',
+                    strokeWidth: '100%',
+                    margin: 2
+                },
+                dataLabels: {
+                    name: {
+                        color: '#94A3B8',
+                        fontSize: '12px',
+                        fontWeight: 700,
+                        offsetY: 22
+                    },
+                    value: {
+                        color: '#F8FAFC',
+                        fontSize: '28px',
+                        fontWeight: 900,
+                        offsetY: -14,
+                        formatter: (value) => `${Math.round(value)}%`
+                    }
+                }
+            }
         },
         fill: {
             type: 'gradient',
             gradient: {
-                type: 'diagonal1',
-                shade: 'light'
+                type: 'horizontal',
+                shade: 'dark',
+                shadeIntensity: 0.15,
+                gradientToColors: ['#2563EB'],
+                inverseColors: false,
+                opacityFrom: 1,
+                opacityTo: 1,
+                stops: [0, 100]
             }
         }
     })
@@ -27,9 +69,9 @@ export default function PieChart({ availablePower }) {
     const [pieChartSeries, setPieChartSeries] = useState([]);
 
     const updatePieChart = () => {
-        let colors = ['#2563EB']
+        let colors = ['#22D3EE']
         if (pieChartAvailablePower <= 20) {
-            colors = ['#EE5577'];
+            colors = ['#FB7185'];
         }
         setPieChartOptions({
             ...pieChartOptions,
@@ -47,6 +89,8 @@ export default function PieChart({ availablePower }) {
     }, [pieChartAvailablePower])
 
     return (
-        <Chart options={pieChartOptions} series={pieChartSeries} type="radialBar" width={250} height={280} />
+        <div className="available-power-meter">
+            <Chart options={pieChartOptions} series={pieChartSeries} type="radialBar" width={220} height={230} />
+        </div>
     )
 }

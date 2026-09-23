@@ -9,9 +9,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     }
 
     return (
-        <div className='min-h-screen max-w-full bg-brand-surface'>
+        <div className='dashboard-shell min-h-screen max-w-full'>
             <Sidebar />
-            <main className="min-h-screen max-w-full px-4 pb-28 pt-8 sm:ml-[length:var(--sidebar-width)] sm:w-[calc(100%-var(--sidebar-width))] sm:p-10 lg:p-12">
+            <main className="min-h-screen max-w-full px-4 pb-28 pt-6 sm:ml-[length:var(--sidebar-width)] sm:w-[calc(100%-var(--sidebar-width))] sm:p-8 lg:p-9">
                 {children}
             </main>
         </div>

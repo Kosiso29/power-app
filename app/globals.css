@@ -37,6 +37,124 @@ body {
     box-shadow: 0 14px 36px rgba(10, 15, 31, 0.06);
 }
 
+.dashboard-shell {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    color: #dbeafe;
+    background:
+        linear-gradient(145deg, rgba(37, 99, 235, 0.22) 0%, transparent 26%),
+        linear-gradient(325deg, rgba(6, 182, 212, 0.14) 0%, transparent 28%),
+        linear-gradient(135deg, #06132d 0%, #07111f 44%, #050b18 100%);
+    background-attachment: fixed;
+}
+
+.dashboard-shell::before {
+    position: fixed;
+    right: -12rem;
+    bottom: -18rem;
+    z-index: -1;
+    width: min(62vw, 720px);
+    aspect-ratio: 1;
+    content: "";
+    background: rgba(37, 99, 235, 0.04);
+    filter: drop-shadow(0 0 34px rgba(6, 182, 212, 0.055));
+    pointer-events: none;
+    -webkit-mask: url("/cyberwatt-logo.png") center / contain no-repeat;
+    mask: url("/cyberwatt-logo.png") center / contain no-repeat;
+}
+
+.dashboard-shell .brand-panel {
+    position: relative;
+    overflow: hidden;
+    border-color: rgba(37, 99, 235, 0.34);
+    background: linear-gradient(145deg, rgba(7, 24, 57, 0.98), rgba(5, 14, 32, 0.96));
+    box-shadow:
+        inset 0 1px 0 rgba(96, 165, 250, 0.11),
+        0 0 0 1px rgba(6, 182, 212, 0.035),
+        0 0 30px rgba(37, 99, 235, 0.11),
+        0 18px 48px rgba(0, 0, 0, 0.26);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+    transition: border-color 220ms ease, box-shadow 220ms ease, transform 220ms ease;
+}
+
+.dashboard-shell .brand-panel::before {
+    position: absolute;
+    top: 0;
+    right: 16px;
+    left: 16px;
+    height: 1px;
+    content: "";
+    background: linear-gradient(90deg, transparent, rgba(37, 99, 235, 0.95), rgba(6, 182, 212, 0.82), transparent);
+    box-shadow: 0 0 18px rgba(37, 99, 235, 0.48);
+    opacity: 0.88;
+    pointer-events: none;
+}
+
+.dashboard-shell .brand-panel:hover {
+    border-color: rgba(6, 182, 212, 0.4);
+    box-shadow:
+        inset 0 1px 0 rgba(96, 165, 250, 0.14),
+        0 0 38px rgba(37, 99, 235, 0.17),
+        0 22px 54px rgba(0, 0, 0, 0.3);
+}
+
+.dashboard-shell .text-brand-navy { color: #f8fafc; }
+.dashboard-shell .text-slate-500,
+.dashboard-shell .text-gray-500 { color: #94a3b8; }
+.dashboard-shell .text-slate-400 { color: #94a3b8; }
+.dashboard-shell .text-slate-600,
+.dashboard-shell .text-slate-700,
+.dashboard-shell .text-gray-600 { color: #cbd5e1; }
+.dashboard-shell .border-slate-200 { border-color: rgba(148, 163, 184, 0.18); }
+
+.dashboard-shell .brand-panel .bg-white,
+.dashboard-shell .brand-panel .bg-slate-50,
+.dashboard-shell .brand-panel .bg-gray-100 {
+    border-color: rgba(148, 163, 184, 0.18);
+    background-color: rgba(15, 23, 42, 0.68);
+}
+
+.dashboard-shell .brand-panel tbody,
+.dashboard-shell .brand-panel thead {
+    color: #cbd5e1;
+}
+
+.dashboard-shell main input:not([type="checkbox"]):not([type="radio"]),
+.dashboard-shell main select {
+    color: #e2e8f0;
+    border-color: rgba(148, 163, 184, 0.24);
+    background-color: rgba(15, 23, 42, 0.72);
+    color-scheme: dark;
+}
+
+.dashboard-shell main input::placeholder { color: #64748b; }
+
+.dashboard-shell .brand-action {
+    color: #e0f2fe;
+    background: rgba(37, 99, 235, 0.14);
+    box-shadow: inset 0 1px 0 rgba(248, 250, 252, 0.12), 0 0 24px rgba(6, 182, 212, 0.1);
+}
+
+.dashboard-shell .brand-action-secondary {
+    color: #cbd5e1;
+    border-color: rgba(148, 163, 184, 0.28);
+    background: rgba(15, 23, 42, 0.64);
+}
+
+.dashboard-shell h1 {
+    text-shadow: 0 0 28px rgba(37, 99, 235, 0.14);
+}
+
+.dashboard-shell h2 {
+    text-shadow: 0 0 18px rgba(6, 182, 212, 0.08);
+}
+
+.available-power-meter {
+    filter: drop-shadow(0 0 12px rgba(34, 211, 238, 0.18));
+}
+
 .brand-action {
     position: relative;
     display: inline-flex;

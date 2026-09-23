@@ -35,7 +35,7 @@ export default function BarChart({ dailyConsumption = {} }) {
             toolbar: {
                 show: false
             },
-            foreColor: '#64748B',
+            foreColor: '#94A3B8',
             fontFamily: 'Arial, Helvetica, sans-serif'
         },
         dataLabels: {
@@ -46,7 +46,7 @@ export default function BarChart({ dailyConsumption = {} }) {
             position: 'top',
             horizontalAlign: 'left'
         },
-        grid: { borderColor: 'rgba(15, 23, 42, 0.08)' },
+        grid: { borderColor: 'rgba(148, 163, 184, 0.14)' },
         plotOptions: { bar: { borderRadius: 4, columnWidth: '54%' } },
         xaxis: {
             categories: chartData.categories
@@ -85,6 +85,6 @@ export default function BarChart({ dailyConsumption = {} }) {
     }, [dailyConsumption]);
 
     return (
-        <Chart options={barChartOptions} series={barChartSeries} type="bar" width={"100%"} height={"auto"} />
+        <Chart options={barChartOptions} series={barChartSeries} type="bar" width={"100%"} height={230} />
     )
 }

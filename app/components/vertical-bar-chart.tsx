@@ -15,7 +15,7 @@ export default function VerticalBarChart({ totalPowerBySwitches }) {
             toolbar: {
                 show: false
             },
-            foreColor: '#64748B',
+            foreColor: '#94A3B8',
             dataLabels: {
                 enabled: false
             },
@@ -29,7 +29,7 @@ export default function VerticalBarChart({ totalPowerBySwitches }) {
                 borderRadius: 4
             }
         },
-        grid: { borderColor: 'rgba(15, 23, 42, 0.08)' },
+        grid: { borderColor: 'rgba(148, 163, 184, 0.14)' },
         xaxis: {
             categories: sortedSwitches,
             labels: {
@@ -77,6 +77,6 @@ export default function VerticalBarChart({ totalPowerBySwitches }) {
     }, [sortedPower, sortedSwitches])
 
     return (
-        <Chart options={verticalBarChartOptions} series={verticalBarChartSeries} type="bar" width={200} height={250} />
+        <Chart options={verticalBarChartOptions} series={verticalBarChartSeries} type="bar" width={180} height={220} />
     )
 }
