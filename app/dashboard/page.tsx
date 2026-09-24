@@ -8,7 +8,6 @@ import Appliance from "../components/appliance";
 import VerticalBarChart from "../components/vertical-bar-chart";
 import PieChart from "../components/pie-chart";
 import BarChart from "../components/bar-chart";
-import Loading from "../components/loading";
 import axios from "axios";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -152,6 +151,28 @@ function mergeCachedSwitchStates(telemetryStates, telemetryTimestamp, cachedStat
     }));
 }
 
+function ChartPlaceholder({ type }) {
+    if (type === "radial") {
+        return <div className="dashboard-skeleton h-40 w-40 rounded-full border-[18px] border-slate-700/70 bg-transparent" />;
+    }
+
+    if (type === "horizontal") {
+        return (
+            <div className="flex h-[220px] w-[180px] flex-col justify-center gap-5">
+                {[82, 64, 92].map(width => <div key={width} className="dashboard-skeleton h-5 rounded-sm" style={{ width: `${width}%` }} />)}
+            </div>
+        );
+    }
+
+    return (
+        <div className="flex h-[230px] w-full items-end gap-3 px-2 pb-4">
+            {[38, 68, 48, 84, 58, 76, 44, 64].map((height, index) => (
+                <div key={`${height}-${index}`} className="dashboard-skeleton min-w-2 flex-1 rounded-t-sm" style={{ height: `${height}%` }} />
+            ))}
+        </div>
+    );
+}
+
 export default function Dashboard() {
     const [dailyConsumption, setDailyConsumption] = useState({});
     const [recommendedActions, setRecommendedActions] = useState([]);
@@ -198,6 +219,7 @@ export default function Dashboard() {
 
     const relaySwitches = Object.keys(totalPowerBySwitches).filter(item => mapSwitchToRelay[item]);
     const switchControls = relaySwitches.length ? relaySwitches : Object.keys(mapSwitchToRelay);
+    const dashboardLoading = switchStates === null;
     const updateSwitchState = (switchName, state) => {
         cacheSwitchState(switchName, state);
         setSwitchStates(prevState => ({ ...(prevState || {}), [switchName]: state }));
@@ -210,21 +232,27 @@ export default function Dashboard() {
                 <h1 className='mt-1 text-3xl font-black text-brand-navy sm:text-4xl'>Cyberwatt dashboard</h1>
                 <p className="mt-2 text-sm text-slate-500">Live device readings and relay control.</p>
             </div>
-            <div className="mt-7 grid w-full gap-4 xl:grid-cols-2">
-                <section className='brand-panel p-4 sm:p-5'>
-                    <h2 className='font-bold text-brand-navy'>Latest Sensor Readings</h2>
-                    <p className="mt-1 text-xs text-slate-500">Most recent raw ADC values</p>
-                    <div className="flex justify-center flex-wrap md:flex-nowrap md:justify-between">
-                        <div className="flex flex-col items-center">
-                            <PieChart availablePower={availablePower} />
-                        </div>
-                        <VerticalBarChart totalPowerBySwitches={totalPowerBySwitches} />
+            <div className="mt-7 grid w-full gap-4 md:grid-cols-2 xl:grid-cols-[minmax(220px,0.7fr)_minmax(260px,0.9fr)_minmax(0,1.6fr)]">
+                <section className='brand-panel flex flex-col p-4 sm:p-5'>
+                    <h2 className='font-bold text-brand-navy'>Available Power</h2>
+                    <p className="mt-1 text-xs text-slate-500">Current available capacity</p>
+                    <div className="mt-3 flex min-h-[230px] justify-center">
+                        {dashboardLoading ? <ChartPlaceholder type="radial" /> : <PieChart availablePower={availablePower} />}
                     </div>
                 </section>
                 <section className='brand-panel p-4 sm:p-5'>
+                    <h2 className='font-bold text-brand-navy'>Latest Sensor Readings</h2>
+                    <p className="mt-1 text-xs text-slate-500">Most recent raw ADC values</p>
+                    <div className="flex min-h-[230px] items-center justify-start">
+                        {dashboardLoading ? <ChartPlaceholder type="horizontal" /> : <VerticalBarChart totalPowerBySwitches={totalPowerBySwitches} />}
+                    </div>
+                </section>
+                <section className='brand-panel p-4 sm:p-5 md:col-span-2 xl:col-span-1'>
                     <h2 className='font-bold text-brand-navy'>Recent Sensor Activity</h2>
                     <p className="mt-1 text-xs text-slate-500">Latest readings over time</p>
-                    <BarChart dailyConsumption={dailyConsumption} />
+                    <div className="min-h-[230px]">
+                        {dashboardLoading ? <ChartPlaceholder type="bars" /> : <BarChart dailyConsumption={dailyConsumption} />}
+                    </div>
                 </section>
             </div>
             <section className='brand-panel mt-4 h-auto w-full p-4 sm:p-5'>
@@ -234,7 +262,13 @@ export default function Dashboard() {
                         <p className="mt-1 text-xs text-slate-500">Switch connected circuits on or off</p>
                         <div className='mt-5 flex flex-wrap items-center gap-7 text-slate-500'>
                         {
-                            switchStates === null ? <Loading /> : switchControls.map(item => (
+                            dashboardLoading ? [0, 1].map(item => (
+                                <div key={item} className="flex w-[78px] flex-col items-center gap-2">
+                                    <div className="dashboard-skeleton h-[78px] w-[78px] rounded-full" />
+                                    <div className="dashboard-skeleton h-3 w-14 rounded-sm" />
+                                    <div className="dashboard-skeleton h-2.5 w-7 rounded-sm" />
+                                </div>
+                            )) : switchControls.map(item => (
                                 <Appliance
                                     key={item}
                                     text={item}

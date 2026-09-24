@@ -17,12 +17,20 @@
     box-sizing: border-box;
 }
 
+html {
+    min-height: 100%;
+    background: #050b18;
+    overscroll-behavior-y: none;
+}
+
 body {
+    min-height: 100%;
     margin: 0;
     padding: 0;
     color: var(--brand-navy);
-    background: var(--brand-surface);
+    background: #050b18;
     font-family: Arial, Helvetica, sans-serif;
+    overscroll-behavior: none;
 }
 
 ::selection {
@@ -155,6 +163,21 @@ body {
     filter: drop-shadow(0 0 12px rgba(34, 211, 238, 0.18));
 }
 
+.dashboard-skeleton {
+    background: linear-gradient(100deg, rgba(51, 65, 85, 0.52) 20%, rgba(37, 99, 235, 0.48) 43%, rgba(103, 232, 249, 0.5) 50%, rgba(37, 99, 235, 0.48) 57%, rgba(51, 65, 85, 0.52) 80%);
+    background-size: 250% 100%;
+    animation: dashboard-skeleton-shimmer 3s linear infinite;
+}
+
+@keyframes dashboard-skeleton-shimmer {
+    from { background-position: 120% 0; }
+    to { background-position: -120% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .dashboard-skeleton { animation: none; }
+}
+
 .brand-action {
     position: relative;
     display: inline-flex;
@@ -184,7 +207,7 @@ body {
     border-radius: inherit;
     content: "";
     pointer-events: none;
-    background: linear-gradient(135deg, transparent 34%, rgba(6, 182, 212, 0.12) 42%, rgba(255, 255, 255, 0.95) 49%, rgba(132, 204, 22, 0.2) 55%, transparent 68%);
+    background: linear-gradient(135deg, transparent 34%, rgba(37, 99, 235, 0.18) 42%, rgba(103, 232, 249, 0.72) 49%, rgba(6, 182, 212, 0.2) 55%, transparent 68%);
     background-position: 100% 100%;
     background-size: 230% 230%;
     -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
@@ -197,7 +220,7 @@ body {
 .brand-action:hover:not(:disabled) {
     transform: translateY(-2px);
     border-color: rgba(37, 99, 235, 0.7);
-    box-shadow: inset 0 1px 0 #fff, 0 18px 40px rgba(37, 99, 235, 0.18), 0 0 24px rgba(6, 182, 212, 0.16);
+    box-shadow: inset 0 1px 0 rgba(6, 182, 212, 0.32), 0 18px 40px rgba(37, 99, 235, 0.18), 0 0 24px rgba(6, 182, 212, 0.16);
 }
 
 .brand-action:active:not(:disabled) {

@@ -256,11 +256,6 @@ export default function Table({ schedules }) {
                         </tbody>
                     </table>
                 </div>
-                <div className='mt-8'>
-                    {
-                        schedules?.length === 0 && <Loading />
-                    }
-                </div>
             </div>
             <YesNo setAnswer={setAnswer} show={!!deleteId && !answer} message="Delete schedule?" />
         </div>

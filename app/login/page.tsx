@@ -38,10 +38,14 @@ export default function Login() {
                     className="object-cover object-[72%_44%] lg:object-center"
                 />
                 <div className="absolute inset-0 bg-gradient-to-b from-brand-navy/65 via-brand-navy/15 to-brand-navy/80 lg:bg-gradient-to-r lg:from-brand-navy/50 lg:via-brand-navy/20 lg:to-transparent" />
-                <div className="relative z-10 flex items-center gap-3 text-white">
+                <a
+                    href="https://cyberwattenergy.com"
+                    aria-label="Return to the Cyberwatt website"
+                    className="relative z-10 flex w-fit items-center gap-3 text-white transition-opacity hover:opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-cyan"
+                >
                     <Image src="/cyberwatt-logo.png" width={45} height={45} alt="" />
                     <span className="brand-wordmark brand-wordmark-header"><span>Cyber</span><span>watt</span></span>
-                </div>
+                </a>
                 <div className="relative z-10 hidden max-w-xl text-white lg:block">
                     <p className="mb-4 text-sm font-bold uppercase text-cyan-200">Smart power for any home</p>
                     <h1 className="text-4xl font-black leading-tight">Your power, under control.</h1>

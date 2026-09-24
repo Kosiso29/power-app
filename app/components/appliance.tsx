@@ -1,7 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react'
 import Image from "next/image";
-import Loading from "@/app/components/loading";
 import { toast } from 'react-toastify';
 import axios from "axios";
 
@@ -13,7 +12,9 @@ export default function Appliance({ initialShow = false, text, size = 40, defaul
     const [switchClicked, setSwitchClicked] = useState(false);
     const [alias, setAlias] = useState("");
     const baseIconSize = typeof size === "number" ? size : Number.parseInt(size, 10) || 40;
-    const iconSize = baseIconSize + 14;
+    const isPrimaryControl = baseIconSize >= 40;
+    const iconSize = isPrimaryControl ? baseIconSize + 14 : baseIconSize;
+    const buttonSize = iconSize + (isPrimaryControl ? 24 : 8);
 
     const getRelayName = () => {
         if (!switchNumber) {
@@ -95,20 +96,35 @@ export default function Appliance({ initialShow = false, text, size = 40, defaul
 
     return (
         <div className='flex flex-col items-center justify-center gap-2'>
-            <button type="button" onClick={handleClick} aria-label={`${show || defaultShow ? 'Turn off' : 'Turn on'} ${alias || text}`} className={`flex items-center justify-center rounded-full border p-3 transition-all ${show || defaultShow ? 'border-cyan-300 bg-brand-cyan text-brand-navy shadow-[0_0_24px_rgba(6,182,212,0.28)]' : 'border-slate-200 bg-slate-100 text-slate-400 hover:border-slate-300'} ${loading ? 'bg-transparent' : ''} ${className}`}>
-                {
-                    loading ? <div className='flex justify-center items-center' style={{ width: size, height: size }}><Loading small /></div> :
-                        <Image
-                            src="/cyberwatt-logo.png"
-                            width={iconSize}
-                            height={iconSize}
-                            alt=""
-                            className="brightness-0"
-                        />
-                }
+            <button
+                type="button"
+                onClick={handleClick}
+                disabled={loading}
+                aria-busy={loading}
+                aria-label={`${show || defaultShow ? 'Turn off' : 'Turn on'} ${alias || text}`}
+                style={{ width: buttonSize, height: buttonSize }}
+                className={`relative flex shrink-0 items-center justify-center rounded-full border p-3 transition-all disabled:cursor-wait ${show || defaultShow ? 'border-cyan-300 bg-brand-cyan text-brand-navy shadow-[0_0_24px_rgba(6,182,212,0.28)]' : 'border-slate-500 bg-slate-500 text-slate-900 shadow-inner hover:border-slate-400 hover:bg-slate-400'} ${className}`}
+            >
+                {loading && (
+                    <span
+                        aria-hidden="true"
+                        className="absolute inset-1.5 animate-spin rounded-full border-2 border-black/20 border-t-black/80"
+                    />
+                )}
+                <Image
+                    src="/cyberwatt-logo.png"
+                    width={iconSize}
+                    height={iconSize}
+                    alt=""
+                    className={`brightness-0 transition-[transform,opacity] duration-200 ${loading ? 'scale-90 opacity-60' : 'scale-100 opacity-100'}`}
+                />
             </button>
             <span className='text-center text-sm font-semibold'>{loading ? alias || "---" : alias || text}</span>
-            {!loading && switchNumber && <span className={`text-[.65rem] font-black uppercase ${show ? 'text-brand-lime' : 'text-slate-400'}`}>{show ? 'On' : 'Off'}</span>}
+            {switchNumber && (
+                <span className={`min-h-4 text-[.65rem] font-black uppercase transition-opacity ${show ? 'text-brand-lime' : 'text-slate-400'} ${loading ? 'opacity-60' : 'opacity-100'}`}>
+                    {show ? 'On' : 'Off'}
+                </span>
+            )}
         </div>
     )
 }

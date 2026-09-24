@@ -14,7 +14,7 @@ export default function NavLink({ href, onClick, children }: { href: string, onC
             className={clsx(
                 "flex h-14 w-16 flex-col items-center justify-center gap-1 rounded-lg border border-transparent p-2 text-[.65rem] font-bold text-slate-300 transition-all hover:border-blue-400/40 hover:bg-blue-500/20 hover:text-white sm:h-16 sm:w-20 sm:text-[.7rem]",
                 {
-                    "border-blue-400 bg-primary text-white shadow-[0_10px_28px_rgba(37,99,235,0.38)]": pathname === href || pathname === href + "/create"
+                    "border-primary bg-primary text-white shadow-none": pathname === href || pathname === href + "/create"
                 }
             )}
         >
