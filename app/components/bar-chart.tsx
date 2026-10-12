@@ -41,6 +41,13 @@ export default function BarChart({ dailyConsumption = {} }) {
         dataLabels: {
             enabled: false
         },
+        tooltip: {
+            theme: 'dark',
+            style: {
+                fontSize: '12px',
+                fontFamily: 'Arial, Helvetica, sans-serif'
+            }
+        },
         legend: {
             show: true,
             position: 'top',

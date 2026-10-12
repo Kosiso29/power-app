@@ -21,6 +21,13 @@ export default function PieChart({ availablePower }) {
         stroke: {
             lineCap: 'round'
         },
+        tooltip: {
+            theme: 'dark',
+            style: {
+                fontSize: '12px',
+                fontFamily: 'Arial, Helvetica, sans-serif'
+            }
+        },
         plotOptions: {
             radialBar: {
                 startAngle: -135,

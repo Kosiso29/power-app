@@ -29,6 +29,13 @@ export default function VerticalBarChart({ totalPowerBySwitches }) {
                 borderRadius: 4
             }
         },
+        tooltip: {
+            theme: 'dark',
+            style: {
+                fontSize: '12px',
+                fontFamily: 'Arial, Helvetica, sans-serif'
+            }
+        },
         grid: { borderColor: 'rgba(148, 163, 184, 0.14)' },
         xaxis: {
             categories: sortedSwitches,
