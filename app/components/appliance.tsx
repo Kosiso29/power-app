@@ -6,7 +6,7 @@ import axios from "axios";
 
 const relayBySwitchNumber: Record<string, string> = { "1": "relay1", "2": "relay2", "17": "relay1", "22": "relay2" };
 
-export default function Appliance({ initialShow = false, text, size = 40, defaultShow, className, switchNumber, onStateChange }: { initialShow?: boolean, text: string, size?: string | number, defaultShow?: boolean, className?: string, switchNumber?: string, onStateChange?: (state: boolean) => void }) {
+export default function Appliance({ initialShow = false, text, size = 40, defaultShow, className, switchNumber, deviceId, onStateChange }: { initialShow?: boolean, text: string, size?: string | number, defaultShow?: boolean, className?: string, switchNumber?: string, deviceId?: string, onStateChange?: (state: boolean) => void }) {
     const [show, setShow] = useState(initialShow);
     const [loading, setLoading] = useState(true);
     const [switchClicked, setSwitchClicked] = useState(false);
@@ -36,6 +36,7 @@ export default function Appliance({ initialShow = false, text, size = 40, defaul
 
         const nextState = !show;
         const apiData = {
+            ...(deviceId ? { device_id: deviceId } : {}),
             [relayName]: nextState,
         };
 

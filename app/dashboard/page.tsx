@@ -3,7 +3,7 @@
 
 'use client'
 
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Appliance from "../components/appliance";
 import VerticalBarChart from "../components/vertical-bar-chart";
 import PieChart from "../components/pie-chart";
@@ -17,6 +17,7 @@ const mapSwitchToRelayName = { SW1: "relay1", SW2: "relay2" };
 const mapSensorToReadingField = { "Sensor 1": "sensor1_raw", "Sensor 2": "sensor2_raw", "Sensor 3": "sensor3_raw" };
 const SWITCH_STATE_CACHE_KEY = "cyberwatt.switchStates";
 const SWITCH_STATE_CACHE_TTL_MS = 5 * 60 * 1000;
+const ACTIVE_DEVICE_KEY = "cyberwatt.activeDeviceId";
 
 function getTelemetryData(responseData) {
     if (responseData?.body) {
@@ -24,6 +25,24 @@ function getTelemetryData(responseData) {
     }
 
     return responseData;
+}
+
+function normalizeDeviceList(responseData) {
+    let data = responseData;
+
+    if (data?.body) {
+        data = typeof data.body === "string" ? JSON.parse(data.body) : data.body;
+    }
+
+    const devices = Array.isArray(data) ? data : data?.devices || data?.items || [];
+
+    return devices.map(device => {
+        if (typeof device === "string" || typeof device === "number") {
+            return { device_id: String(device) };
+        }
+
+        return device;
+    }).filter(device => device?.device_id);
 }
 
 function toNumber(value) {
@@ -97,7 +116,8 @@ function normalizeTelemetryData(data) {
         switchName,
         toBoolean(latestReading[relayName]),
     ]));
-    const cachedStates = getCachedSwitchStates();
+    const telemetryDeviceId = data.device_id || latestReading.device_id;
+    const cachedStates = getCachedSwitchStates(telemetryDeviceId);
     const mergedSwitchStates = mergeCachedSwitchStates(switchStates, latestReadingTimestamp, cachedStates);
 
     return {
@@ -110,25 +130,25 @@ function normalizeTelemetryData(data) {
     };
 }
 
-function getCachedSwitchStates() {
+function getCachedSwitchStates(deviceId = "default") {
     if (typeof window === "undefined") {
         return {};
     }
 
     try {
-        return JSON.parse(localStorage.getItem(SWITCH_STATE_CACHE_KEY) || "{}");
+        return JSON.parse(localStorage.getItem(`${SWITCH_STATE_CACHE_KEY}.${deviceId}`) || "{}");
     } catch {
         return {};
     }
 }
 
-function cacheSwitchState(switchName, state) {
+function cacheSwitchState(switchName, state, deviceId) {
     if (typeof window === "undefined") {
         return;
     }
 
-    const cachedStates = getCachedSwitchStates();
-    localStorage.setItem(SWITCH_STATE_CACHE_KEY, JSON.stringify({
+    const cachedStates = getCachedSwitchStates(deviceId);
+    localStorage.setItem(`${SWITCH_STATE_CACHE_KEY}.${deviceId || "default"}`, JSON.stringify({
         ...cachedStates,
         [switchName]: {
             state,
@@ -137,7 +157,7 @@ function cacheSwitchState(switchName, state) {
     }));
 }
 
-function mergeCachedSwitchStates(telemetryStates, telemetryTimestamp, cachedStates = getCachedSwitchStates()) {
+function mergeCachedSwitchStates(telemetryStates, telemetryTimestamp, cachedStates = {}) {
     const now = Date.now();
 
     return Object.fromEntries(Object.entries(telemetryStates).map(([switchName, telemetryState]) => {
@@ -180,11 +200,13 @@ export default function Dashboard() {
     const [totalPowerBySwitches, setTotalPowerBySwitches] = useState({});
     const [availablePower, setAvailablePower] = useState([]);
     const [switchStates, setSwitchStates] = useState(null);
-    const telemetryLoaded = useRef(false);
+    const [devices, setDevices] = useState([]);
+    const [activeDeviceId, setActiveDeviceId] = useState("");
+    const [devicesLoading, setDevicesLoading] = useState(true);
 
-    const getData = async () => {
+    const getData = async (deviceId) => {
         await new Promise((resolve, reject) => {
-            axios.get('/api/devices/telemetry')
+            axios.get('/api/devices/telemetry', { params: { device_id: deviceId } })
                 .then(response => getTelemetryData(response.data))
                 .then(data => {
                     const telemetry = normalizeTelemetryData(data);
@@ -202,35 +224,84 @@ export default function Dashboard() {
     }
 
     useEffect(() => {
-        if (!telemetryLoaded.current) {
-            telemetryLoaded.current = true;
-            getData().catch((error) => {
+        axios.get('/api/devices')
+            .then(response => normalizeDeviceList(response.data))
+            .then(deviceList => {
+                setDevices(deviceList);
+                const storedDeviceId = window.localStorage.getItem(ACTIVE_DEVICE_KEY);
+                const selectedDevice = deviceList.find(device => device.device_id === storedDeviceId) || deviceList[0];
+
+                if (selectedDevice) {
+                    setActiveDeviceId(selectedDevice.device_id);
+                    window.localStorage.setItem(ACTIVE_DEVICE_KEY, selectedDevice.device_id);
+                } else {
+                    setSwitchStates({ SW1: false, SW2: false });
+                }
+            })
+            .catch((error) => {
                 if (error?.response?.status === 401) {
                     window.location.replace('/api/auth/logout');
                     return;
                 }
 
-                telemetryLoaded.current = false;
                 setSwitchStates({ SW1: false, SW2: false });
-                toast.error('Unable to load dashboard data');
-            });
-        }
+                toast.error('Unable to load your devices');
+            })
+            .finally(() => setDevicesLoading(false));
     }, []);
+
+    useEffect(() => {
+        if (!activeDeviceId) {
+            return;
+        }
+
+        setSwitchStates(null);
+        getData(activeDeviceId).catch((error) => {
+            if (error?.response?.status === 401) {
+                window.location.replace('/api/auth/logout');
+                return;
+            }
+
+            setSwitchStates({ SW1: false, SW2: false });
+            toast.error('Unable to load dashboard data');
+        });
+    }, [activeDeviceId]);
 
     const relaySwitches = Object.keys(totalPowerBySwitches).filter(item => mapSwitchToRelay[item]);
     const switchControls = relaySwitches.length ? relaySwitches : Object.keys(mapSwitchToRelay);
     const dashboardLoading = switchStates === null;
     const updateSwitchState = (switchName, state) => {
-        cacheSwitchState(switchName, state);
+        cacheSwitchState(switchName, state, activeDeviceId);
         setSwitchStates(prevState => ({ ...(prevState || {}), [switchName]: state }));
+    };
+    const selectDevice = (deviceId) => {
+        setActiveDeviceId(deviceId);
+        window.localStorage.setItem(ACTIVE_DEVICE_KEY, deviceId);
     };
 
     return (
         <div className="mx-auto max-w-[1440px]">
-            <div>
-                <p className="text-xs font-black uppercase text-brand-cyan">Energy overview</p>
-                <h1 className='mt-1 text-3xl font-black text-brand-navy sm:text-4xl'>Cyberwatt dashboard</h1>
-                <p className="mt-2 text-sm text-slate-500">Live device readings and relay control.</p>
+            <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
+                <div>
+                    <p className="text-xs font-black uppercase text-brand-cyan">Energy overview</p>
+                    <h1 className='mt-1 text-3xl font-black text-brand-navy sm:text-4xl'>Cyberwatt dashboard</h1>
+                    <p className="mt-2 text-sm text-slate-500">Live device readings and relay control.</p>
+                </div>
+                <div className="w-full sm:w-64">
+                    <label htmlFor="activeDevice" className="mb-2 block text-xs font-black uppercase text-brand-cyan">Active device</label>
+                    <select
+                        id="activeDevice"
+                        value={activeDeviceId}
+                        onChange={(event) => selectDevice(event.target.value)}
+                        disabled={devicesLoading || devices.length === 0}
+                        className="min-h-11 w-full rounded-lg border px-3 text-sm disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                        {devices.length === 0 && <option value="">{devicesLoading ? "Loading devices..." : "No claimed devices"}</option>}
+                        {devices.map(device => (
+                            <option key={device.device_id} value={device.device_id}>{device.name || device.device_name || device.device_id}</option>
+                        ))}
+                    </select>
+                </div>
             </div>
             <div className="mt-7 grid w-full gap-4 md:grid-cols-2 xl:grid-cols-[minmax(220px,0.7fr)_minmax(260px,0.9fr)_minmax(0,1.6fr)]">
                 <section className='brand-panel flex flex-col p-4 sm:p-5'>
@@ -273,6 +344,7 @@ export default function Dashboard() {
                                     key={item}
                                     text={item}
                                     switchNumber={mapSwitchToRelay[item]}
+                                    deviceId={activeDeviceId}
                                     initialShow={switchStates[item] === true}
                                     onStateChange={(state) => updateSwitchState(item, state)}
                                 />
@@ -290,6 +362,7 @@ export default function Dashboard() {
                                         key={item}
                                         text={item}
                                         switchNumber={mapSwitchToRelay[item]}
+                                        deviceId={activeDeviceId}
                                         initialShow={switchStates?.[item] === true}
                                         onStateChange={(state) => updateSwitchState(item, state)}
                                     />

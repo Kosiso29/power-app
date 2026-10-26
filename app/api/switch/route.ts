@@ -11,9 +11,25 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ message: "Session expired. Please sign in again." }, { status: 401 });
     }
 
-    const switchUrl = `${DEVICE_API_URL.replace(/\/$/, "")}/devices/${encodeURIComponent(DEVICE_ID)}/switch`;
-    const payload = await request.json();
-    const requestBody = JSON.stringify(payload);
+    let payload: Record<string, unknown>;
+
+    try {
+        payload = await request.json();
+    } catch {
+        return NextResponse.json({ message: "Invalid switch request." }, { status: 400 });
+    }
+
+    const requestedDeviceId = typeof payload.device_id === "string" ? payload.device_id.trim() : "";
+    const deviceId = requestedDeviceId || DEVICE_ID;
+
+    if (!deviceId || deviceId.length > 128 || !/^[A-Za-z0-9:_-]+$/.test(deviceId)) {
+        return NextResponse.json({ message: "Enter a valid Device ID." }, { status: 400 });
+    }
+
+    const relayPayload = { ...payload };
+    delete relayPayload.device_id;
+    const switchUrl = `${DEVICE_API_URL.replace(/\/$/, "")}/devices/${encodeURIComponent(deviceId)}/switch`;
+    const requestBody = JSON.stringify(relayPayload);
 
     const response = await fetch(switchUrl, {
         method: "POST",

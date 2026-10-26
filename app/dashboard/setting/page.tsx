@@ -53,6 +53,7 @@ export default function Setting() {
 
             setSuccess(true);
             setMessage(responseData.message || "Device claimed successfully. Refreshing your dashboard...");
+            window.localStorage.setItem("cyberwatt.activeDeviceId", normalizedDeviceId);
             setDeviceId("");
             router.refresh();
             window.setTimeout(() => window.location.assign("/dashboard"), 1200);

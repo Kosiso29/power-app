@@ -11,7 +11,14 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ message: "Session expired. Please sign in again." }, { status: 401 });
     }
 
-    const telemetryUrl = `${DEVICE_API_URL.replace(/\/$/, "")}/devices/${encodeURIComponent(DEVICE_ID)}/telemetry`;
+    const requestedDeviceId = request.nextUrl.searchParams.get("device_id")?.trim();
+    const deviceId = requestedDeviceId || DEVICE_ID;
+
+    if (!deviceId || deviceId.length > 128 || !/^[A-Za-z0-9:_-]+$/.test(deviceId)) {
+        return NextResponse.json({ message: "Enter a valid Device ID." }, { status: 400 });
+    }
+
+    const telemetryUrl = `${DEVICE_API_URL.replace(/\/$/, "")}/devices/${encodeURIComponent(deviceId)}/telemetry`;
 
     const response = await fetch(telemetryUrl, {
         method: "GET",
