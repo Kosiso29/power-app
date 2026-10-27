@@ -84,6 +84,6 @@ export default function VerticalBarChart({ totalPowerBySwitches }) {
     }, [sortedPower, sortedSwitches])
 
     return (
-        <Chart options={verticalBarChartOptions} series={verticalBarChartSeries} type="bar" width={180} height={220} />
+        <Chart options={verticalBarChartOptions} series={verticalBarChartSeries} type="bar" width={230} height={230} />
     )
 }

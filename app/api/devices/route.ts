@@ -12,7 +12,8 @@ export async function GET(request: NextRequest) {
     }
 
     try {
-        const response = await fetch(`${DEVICE_API_URL.replace(/\/$/, "")}/devices`, {
+        const devicesUrl = `${DEVICE_API_URL.replace(/\/$/, "")}/devices`;
+        const response = await fetch(devicesUrl, {
             method: "GET",
             headers: { "Authorization": idToken },
             cache: "no-store",

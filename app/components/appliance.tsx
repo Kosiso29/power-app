@@ -4,7 +4,9 @@ import Image from "next/image";
 import { toast } from 'react-toastify';
 import axios from "axios";
 
-const relayBySwitchNumber: Record<string, string> = { "1": "relay1", "2": "relay2", "17": "relay1", "22": "relay2" };
+const relayBySwitchNumber: Record<string, string> = Object.fromEntries(
+    Array.from({ length: 8 }, (_, index) => [String(index + 1), `relay${index + 1}`])
+);
 
 export default function Appliance({ initialShow = false, text, size = 40, defaultShow, className, switchNumber, deviceId, onStateChange }: { initialShow?: boolean, text: string, size?: string | number, defaultShow?: boolean, className?: string, switchNumber?: string, deviceId?: string, onStateChange?: (state: boolean) => void }) {
     const [show, setShow] = useState(initialShow);

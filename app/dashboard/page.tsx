@@ -12,8 +12,8 @@ import axios from "axios";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-const mapSwitchToRelay = { SW1: "1", SW2: "2" };
-const mapSwitchToRelayName = { SW1: "relay1", SW2: "relay2" };
+const mapSwitchToRelay = Object.fromEntries(Array.from({ length: 8 }, (_, index) => [`SW${index + 1}`, String(index + 1)]));
+const mapSwitchToRelayName = Object.fromEntries(Array.from({ length: 8 }, (_, index) => [`SW${index + 1}`, `relay${index + 1}`]));
 const mapSensorToReadingField = { "Sensor 1": "sensor1_raw", "Sensor 2": "sensor2_raw", "Sensor 3": "sensor3_raw" };
 const SWITCH_STATE_CACHE_KEY = "cyberwatt.switchStates";
 const SWITCH_STATE_CACHE_TTL_MS = 5 * 60 * 1000;
@@ -80,6 +80,25 @@ function getChartLabel(timestamp, index) {
     });
 }
 
+function getCurrentChannelIds(readings) {
+    const channelIds = new Set();
+
+    readings.forEach(reading => {
+        (reading?.current_channels || []).forEach(channel => {
+            if (channel?.available !== false && channel?.channel !== undefined) {
+                channelIds.add(String(channel.channel));
+            }
+        });
+    });
+
+    return [...channelIds].sort((a, b) => Number(a) - Number(b));
+}
+
+function getCurrentChannelValue(reading, channelId) {
+    const channel = (reading?.current_channels || []).find(item => String(item?.channel) === channelId);
+    return channel?.available === false ? 0 : toNumber(channel?.mean_raw);
+}
+
 function normalizeTelemetryData(data) {
     if (!Array.isArray(data?.readings)) {
         const insights = data?.insights || {};
@@ -101,31 +120,44 @@ function normalizeTelemetryData(data) {
     const latestReading = readings[readings.length - 1] || {};
     const latestReadingTimestamp = getReadingTimestamp(latestReading);
     const recentReadings = readings.slice(-12);
-    const dailyConsumption = {
+    const currentChannelIds = getCurrentChannelIds(readings);
+    const usesCurrentChannels = currentChannelIds.length > 0;
+    const dailyConsumption = usesCurrentChannels ? {
+        categories: recentReadings.map((reading, index) => getChartLabel(reading.timestamp, index)),
+        series: currentChannelIds.map(channelId => ({
+            name: `Channel ${channelId}`,
+            data: recentReadings.map(reading => getCurrentChannelValue(reading, channelId)),
+        })),
+    } : {
         categories: recentReadings.map((reading, index) => getChartLabel(reading.timestamp, index)),
         series: Object.entries(mapSensorToReadingField).map(([sensorName, readingField]) => ({
             name: sensorName,
             data: recentReadings.map(reading => toNumber(reading[readingField])),
         })),
     };
-    const totalPowerBySwitches = Object.fromEntries(Object.entries(mapSensorToReadingField).map(([sensorName, readingField]) => [
-        sensorName,
-        toNumber(latestReading[readingField]),
-    ]));
-    const switchStates = Object.fromEntries(Object.entries(mapSwitchToRelayName).map(([switchName, relayName]) => [
-        switchName,
-        toBoolean(latestReading[relayName]),
-    ]));
+    const totalPowerBySwitches = usesCurrentChannels
+        ? Object.fromEntries(currentChannelIds.map(channelId => [`Channel ${channelId}`, getCurrentChannelValue(latestReading, channelId)]))
+        : Object.fromEntries(Object.entries(mapSensorToReadingField).map(([sensorName, readingField]) => [
+            sensorName,
+            toNumber(latestReading[readingField]),
+        ]));
+    const availableRelayStates = (latestReading?.relay_states || []).filter(relay => relay?.available !== false && relay?.relay !== undefined);
+    const switchStates = availableRelayStates.length
+        ? Object.fromEntries(availableRelayStates.map(relay => [`SW${relay.relay}`, toBoolean(relay.state)]))
+        : Object.fromEntries(Object.entries(mapSwitchToRelayName).map(([switchName, relayName]) => [
+            switchName,
+            toBoolean(latestReading[relayName]),
+        ]));
     const telemetryDeviceId = data.device_id || latestReading.device_id;
     const cachedStates = getCachedSwitchStates(telemetryDeviceId);
     const mergedSwitchStates = mergeCachedSwitchStates(switchStates, latestReadingTimestamp, cachedStates);
 
     return {
         dailyConsumption,
-        recommendedActions: [],
-        switchesToTurnOff: [],
+        recommendedActions: data?.insights?.recommended_actions || [],
+        switchesToTurnOff: data?.insights?.switches_to_turn_off || [],
         totalPowerBySwitches,
-        availablePower: 0,
+        availablePower: toNumber(data?.available_power_percent ?? data?.available_power?.percentage),
         switchStates: mergedSwitchStates,
     };
 }
@@ -245,7 +277,7 @@ export default function Dashboard() {
                 }
 
                 setSwitchStates({ SW1: false, SW2: false });
-                toast.error('Unable to load your devices');
+                toast.error(error?.response?.data?.message || error?.response?.data?.error || 'Unable to load your devices');
             })
             .finally(() => setDevicesLoading(false));
     }, []);
@@ -263,12 +295,11 @@ export default function Dashboard() {
             }
 
             setSwitchStates({ SW1: false, SW2: false });
-            toast.error('Unable to load dashboard data');
+            toast.error(error?.response?.data?.message || error?.response?.data?.error || 'Unable to load dashboard data');
         });
     }, [activeDeviceId]);
 
-    const relaySwitches = Object.keys(totalPowerBySwitches).filter(item => mapSwitchToRelay[item]);
-    const switchControls = relaySwitches.length ? relaySwitches : Object.keys(mapSwitchToRelay);
+    const switchControls = switchStates ? Object.keys(switchStates) : Object.keys(mapSwitchToRelay);
     const dashboardLoading = switchStates === null;
     const updateSwitchState = (switchName, state) => {
         cacheSwitchState(switchName, state, activeDeviceId);
