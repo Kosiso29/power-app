@@ -1,390 +1,206 @@
-//@ts-nocheck
+'use client'
 
-import { useState } from "react";
-import Link from 'next/link';
-import {
-    CheckIcon,
-    ClockIcon,
-    UserCircleIcon,
-    CalendarIcon,
-    XMarkIcon,
-    ArrowPathRoundedSquareIcon,
-    ArrowUturnDownIcon
-} from '@heroicons/react/24/outline';
-import { toast } from 'react-toastify';
-import Loading from "@/app/components/loading";
-import { useSelector } from "react-redux";
-import axios from "axios";
-import 'react-toastify/dist/ReactToastify.css';
-import { getAuthIdToken } from "@/app/utils/authSession";
+import { FormEvent, useEffect, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { CalendarIcon, ClockIcon } from "@heroicons/react/24/outline";
+import { toast } from "react-toastify";
 
-const switches = ['SW1', 'SW2', 'SW3', 'SW4']
+export type Schedule = {
+    schedule_id: string;
+    device_id: string;
+    schedule_name: string;
+    schedule_type?: string;
+    relay_numbers: number[];
+    target_state: "ON" | "OFF";
+    start_date: string;
+    end_date: string;
+    start_time: string;
+    end_time: string;
+    timezone: string;
+    days: string[];
+    status: "active" | "inactive";
+};
 
-const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+type Device = { device_id: string; product?: string | null; relay_count?: number | null };
 
-export default function Form({ schedule }: { schedule?: any }) {
+const DAYS = [
+    ["MON", "Monday"], ["TUE", "Tuesday"], ["WED", "Wednesday"],
+    ["THU", "Thursday"], ["FRI", "Friday"], ["SAT", "Saturday"], ["SUN", "Sunday"],
+] as const;
+
+function getErrorMessage(error: unknown) {
+    return error instanceof Error ? error.message : "The schedule could not be saved.";
+}
+
+export default function Form({ schedule }: { schedule?: Schedule }) {
+    const router = useRouter();
+    const [devices, setDevices] = useState<Device[]>([]);
+    const [selectedDeviceId, setSelectedDeviceId] = useState(schedule?.device_id || "");
+    const [scheduleType, setScheduleType] = useState(schedule?.schedule_type || "recurring");
+    const [devicesLoading, setDevicesLoading] = useState(true);
     const [loading, setLoading] = useState(false);
-    const deviceId = useSelector(state => state.authReducer.deviceId);
+    const today = new Date().toISOString().split("T")[0];
+    const defaultTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone || "Africa/Lagos";
 
-    const postData = async (apiData: any, idToken) => {
-        await new Promise((resolve, reject) => {
-            axios.post('https://5jl4i1e6j7.execute-api.eu-west-3.amazonaws.com/dev', { ...apiData }, {
-                headers: {
-                    'Authorization': `${idToken}`
+    useEffect(() => {
+        let active = true;
+        fetch("/api/devices", { cache: "no-store" })
+            .then(async response => {
+                const body = await response.json().catch(() => ({}));
+                if (!response.ok) throw new Error(body.message || "Unable to load your devices.");
+                return Array.isArray(body) ? body : body.devices || body.items || [];
+            })
+            .then(items => {
+                if (!active) return;
+                setDevices(items);
+                if (!schedule?.device_id && items.length > 0) {
+                    const storedId = window.localStorage.getItem("cyberwatt.activeDeviceId");
+                    const initialId = items.some((item: Device) => item.device_id === storedId) ? storedId : items[0].device_id;
+                    setSelectedDeviceId(initialId || "");
                 }
             })
-                .then(response => {
-                    setLoading(false);
-                    toast.success('Schedule created');
-                    resolve(response);
-                })
-                .then(() => window.location.href = "/dashboard/schedule")
-                .catch((error) => {
-                    setLoading(false);
-                    toast.error(`There was an error: ${error?.response?.data || error?.response || error}`)
-                });
-        })
-    }
+            .catch(error => active && toast.error(getErrorMessage(error)))
+            .finally(() => active && setDevicesLoading(false));
+        return () => { active = false; };
+    }, [schedule?.device_id]);
 
-    const patchData = async (apiData: any, idToken) => {
-        await new Promise((resolve, reject) => {
-            axios.put(`https://5jl4i1e6j7.execute-api.eu-west-3.amazonaws.com/dev/${deviceId}?sort_key=${schedule.id}`, { ...apiData }, {
-                headers: {
-                    'Authorization': `${idToken}`
-                }
-            })
-                .then(response => {
-                    setLoading(false);
-                    toast.success('Schedule updated');
-                    resolve(response);
-                })
-                .then(() => window.location.href = "/dashboard/schedule")
-                .catch((error) => {
-                    setLoading(false);
-                    toast.error(`There was an error: ${error?.response?.data || error?.response || error}`)
-                });
-        })
-    }
+    const selectedDevice = devices.find(device => device.device_id === selectedDeviceId);
+    const relayCount = Math.max(1, selectedDevice?.relay_count || 8);
 
-    const getFormData = async (formData: any) => {
-        const formDataObject: any = {};
+    async function submit(event: FormEvent<HTMLFormElement>) {
+        event.preventDefault();
+        if (loading) return;
 
-        formData.forEach((value: any, key: any) => {
-            if (!/days|switches/.test(key)) {
-                formDataObject[key] = value;
-            }
-        });
-
-        const switches = formData.getAll('switches');
-        const days = formData.getAll('days')
-        const apiData = {
-            ...formDataObject,
-            switches,
-            days,
-            effect: formDataObject.effect || 'off',
-            device_id: deviceId,
-            from: Number(formDataObject.from.replace(':', '')),
-            to: Number(formDataObject.to.replace(':', ''))
-        }
-        const idToken = getAuthIdToken();
-
-        if (!idToken) {
-            toast.error('Session expired. Please sign in again.');
+        const formData = new FormData(event.currentTarget);
+        const relayNumbers = formData.getAll("relay_numbers").map(Number);
+        const selectedScheduleType = String(formData.get("schedule_type") || "recurring");
+        const days = selectedScheduleType === "recurring" ? formData.getAll("days").map(String) : [];
+        if (!relayNumbers.length || (selectedScheduleType === "recurring" && !days.length)) {
+            toast.error(!relayNumbers.length ? "Select at least one relay." : "Select at least one day for a recurring schedule.");
             return;
         }
 
-        if (schedule) {
-            await patchData(apiData, idToken);
-        } else {
-            await postData(apiData, idToken);
+        const payload = {
+            device_id: String(formData.get("device_id") || ""),
+            schedule_name: String(formData.get("schedule_name") || "").trim(),
+            schedule_type: selectedScheduleType,
+            relay_numbers: relayNumbers,
+            target_state: String(formData.get("target_state")),
+            start_date: String(formData.get("start_date")),
+            end_date: String(formData.get("end_date")),
+            start_time: String(formData.get("start_time")),
+            end_time: String(formData.get("end_time")),
+            timezone: String(formData.get("timezone") || defaultTimezone),
+            days,
+            status: String(formData.get("status")),
+        };
+
+        setLoading(true);
+        try {
+            const endpoint = schedule ? `/api/schedules/${encodeURIComponent(schedule.schedule_id)}` : "/api/schedules";
+            const response = await fetch(endpoint, {
+                method: schedule ? "PUT" : "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+            });
+            const body = await response.json().catch(() => ({}));
+            if (!response.ok) throw new Error(body.message || body.error || "The schedule could not be saved.");
+
+            toast.success(body.message || `Schedule ${schedule ? "updated" : "created"} successfully.`);
+            router.push("/dashboard/schedule");
+            router.refresh();
+        } catch (error) {
+            toast.error(getErrorMessage(error));
+        } finally {
+            setLoading(false);
         }
     }
 
-    const convertIntegerTime = (time) => {
-        if (!time) return;
-        let newTime = time.toString();
-        if (newTime.length < 4) {
-            newTime = "0" + newTime;
-        }
-        return newTime.slice(0, 2) + ":" + newTime.slice(2);
-    }
+    const inputClass = "block w-full rounded-md border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-brand-cyan focus:ring-2 focus:ring-brand-cyan/20";
 
     return (
-        <form aria-describedby="form-error" action={getFormData}>
+        <form onSubmit={submit}>
             <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 text-brand-navy md:p-6">
-                {/* Schedule Type */}
-                <div className="mb-4">
-                    <label htmlFor="scheduleType" className="mb-2 block text-sm font-medium">
-                        Schedule type
-                    </label>
-                    <div className="relative">
-                        <select
-                            id="scheduleType"
-                            name="schedule_type"
-                            className="peer block w-full cursor-pointer rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
-                            defaultValue={schedule?.schedule_type || ""}
-                            aria-describedby="scheduleType-error"
-                        >
-                            <option value="" disabled>
-                                Select a type
-                            </option>
-                            <option value="Automatic">
-                                Automatic
-                            </option>
-                            <option value="Manual">
-                                Manual
-                            </option>
+                <div className="grid gap-5 md:grid-cols-2">
+                    <label className="block text-sm font-medium">
+                        <span className="mb-2 block">Device</span>
+                        <select name="device_id" required value={selectedDeviceId} onChange={event => setSelectedDeviceId(event.target.value)} disabled={devicesLoading} className={inputClass}>
+                            <option value="" disabled>{devicesLoading ? "Loading devices..." : "Select a device"}</option>
+                            {devices.map(device => <option key={device.device_id} value={device.device_id}>{device.product ? `${device.product} - ` : ""}{device.device_id}</option>)}
                         </select>
-                        <ClockIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500" />
-                    </div>
-                </div>
-
-                {/* Schedule Name */}
-                <div className="mb-4">
-                    <label htmlFor="scheduleName" className="mb-2 block text-sm font-medium">
-                        Schedule name
                     </label>
-                    <div className="relative mt-2 rounded-md">
-                        <div className="relative">
-                            <input
-                                id="scheduleName"
-                                name="schedule_name"
-                                type="text"
-                                defaultValue={schedule?.schedule_name}
-                                placeholder="Name of Schedule"
-                                className="peer block w-full rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
-                                aria-describedby="scheduleName-error"
-                            />
-                            <UserCircleIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500" />
-                        </div>
-                    </div>
+                    <label className="block text-sm font-medium">
+                        <span className="mb-2 block">Schedule name</span>
+                        <input name="schedule_name" required maxLength={100} defaultValue={schedule?.schedule_name} placeholder="Evening lighting" className={inputClass} />
+                    </label>
                 </div>
 
-                {/* Switches */}
-                <fieldset className='mb-4'>
-                    <legend className="mb-2 block text-sm font-medium">
-                        Switches
-                    </legend>
-                    <div className="rounded-md border border-gray-200 bg-white px-[14px] py-3">
-                        <div className="flex flex-wrap gap-4">
-                            {
-                                switches.map((item, index) => (
-                                    <div key={item} className="flex items-center gap-2">
-                                        <label
-                                            htmlFor={item}
-                                            className="flex cursor-pointer items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-bold text-white"
-                                        >
-                                            {item}
-                                        </label>
-                                        <input
-                                            id={item}
-                                            name="switches"
-                                            type="checkbox"
-                                            defaultChecked={schedule?.switches.includes(item)}
-                                            value={item}
-                                            className="h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-2"
-                                            aria-describedby="switches-error"
-                                        />
-                                    </div>
-                                ))
-                            }
-                        </div>
+                <label className="mt-5 block text-sm font-medium">
+                    <span className="mb-2 block">Schedule type</span>
+                    <select name="schedule_type" required value={scheduleType} onChange={event => setScheduleType(event.target.value)} className={inputClass}>
+                        <option value="recurring">Recurring</option>
+                        <option value="once">Once</option>
+                    </select>
+                </label>
+
+                <fieldset className="mt-5">
+                    <legend className="mb-2 text-sm font-medium">Relays</legend>
+                    <div className="flex flex-wrap gap-2 rounded-md border border-slate-200 bg-white p-3">
+                        {Array.from({ length: relayCount }, (_, index) => index + 1).map(relay => (
+                            <label key={relay} className="flex cursor-pointer items-center gap-2 rounded-md border border-slate-200 px-3 py-2 text-sm">
+                                <input name="relay_numbers" type="checkbox" value={relay} defaultChecked={schedule?.relay_numbers.includes(relay)} className="h-4 w-4 accent-blue-600" /> Relay {relay}
+                            </label>
+                        ))}
                     </div>
                 </fieldset>
 
-                {/* Effect */}
-                <fieldset className='mb-4'>
-                    <legend className="mb-2 block text-sm font-medium">
-                        Switches state (should switches be turned on or off?)
-                    </legend>
-                    <div className="rounded-md border border-gray-200 bg-white px-[14px] py-3 text-[.8rem] w-fit flex gap-2 items-center">
-                        <span>OFF</span>
-                        <label htmlFor='effect' className="switch">
-                            <input id='effect' name='effect' type="checkbox" defaultChecked={schedule?.effect === "on"} className="" />
-                            <span className="slider"></span>
-                        </label>
-                        <span>ON</span>
-                    </div>
-                </fieldset>
-
-                {/* Start date */}
-                <div className="mb-4">
-                    <label htmlFor="startDate" className="mb-2 block text-sm font-medium">
-                        Choose start date
-                    </label>
-                    <div className="relative mt-2 rounded-md">
-                        <div className="relative">
-                            <input
-                                id="startDate"
-                                name="start_date"
-                                type="date"
-                                defaultValue={schedule ? schedule?.start_date : new Date().toISOString().split('T')[0]}
-                                placeholder="Start date"
-                                className="peer block w-full rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
-                                aria-describedby="startDate-error"
-                            />
-                            <CalendarIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
-                        </div>
-                    </div>
+                <div className="mt-5 grid gap-5 md:grid-cols-2">
+                    <RadioField legend="Target state" name="target_state" values={["ON", "OFF"]} selected={schedule?.target_state || "OFF"} />
+                    <RadioField legend="Status" name="status" values={["active", "inactive"]} selected={schedule?.status || "active"} />
                 </div>
 
-                {/* End date */}
-                <div className="mb-4">
-                    <label htmlFor="endDate" className="mb-2 block text-sm font-medium">
-                        Choose end date
-                    </label>
-                    <div className="relative mt-2 rounded-md">
-                        <div className="relative">
-                            <input
-                                id="endDate"
-                                name="end_date"
-                                type="date"
-                                defaultValue={schedule ? schedule?.end_date : new Date().toISOString().split('T')[0]}
-                                placeholder="End date"
-                                className="peer block w-full rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
-                                aria-describedby="endDate-error"
-                            />
-                            <CalendarIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
-                        </div>
-                    </div>
+                <div className="mt-5 grid gap-5 md:grid-cols-2">
+                    <DateTimeField icon="date" label="Start date" name="start_date" type="date" value={schedule?.start_date || today} inputClass={inputClass} />
+                    <DateTimeField icon="date" label="End date" name="end_date" type="date" value={schedule?.end_date || today} inputClass={inputClass} />
+                    <DateTimeField icon="time" label="Start time" name="start_time" type="time" value={schedule?.start_time || "18:30"} inputClass={inputClass} />
+                    <DateTimeField icon="time" label="End time" name="end_time" type="time" value={schedule?.end_time || "23:00"} inputClass={inputClass} />
                 </div>
 
-                {/* Start time */}
-                <div className="mb-4">
-                    <label htmlFor="startTime" className="mb-2 block text-sm font-medium">
-                        Choose start time
-                    </label>
-                    <div className="relative mt-2 rounded-md">
-                        <div className="relative">
-                            <input
-                                id="startTime"
-                                name="from"
-                                type="time"
-                                defaultValue={schedule ? convertIntegerTime(schedule?.from) : `${new Date().getHours().toString().padStart(2, '0')}:${new Date().getMinutes().toString().padStart(2, '0')}`}
-                                placeholder="Start time"
-                                className="peer block w-full rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
-                                aria-describedby="startTime-error"
-                            />
-                            <CalendarIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
-                        </div>
-                    </div>
-                </div>
+                <label className="mt-5 block text-sm font-medium">
+                    <span className="mb-2 block">Timezone</span>
+                    <input name="timezone" required defaultValue={schedule?.timezone || defaultTimezone} className={inputClass} />
+                </label>
 
-                {/* End time */}
-                <div className="mb-4">
-                    <label htmlFor="endTime" className="mb-2 block text-sm font-medium">
-                        Choose end time
-                    </label>
-                    <div className="relative mt-2 rounded-md">
-                        <div className="relative">
-                            <input
-                                id="endTime"
-                                name="to"
-                                type="time"
-                                defaultValue={schedule ? convertIntegerTime(schedule?.to) : `${new Date().getHours().toString().padStart(2, '0')}:${new Date().getMinutes().toString().padStart(2, '0')}`}
-                                placeholder="End time"
-                                className="peer block w-full rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
-                                aria-describedby="endTime-error"
-                            />
-                            <CalendarIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
-                        </div>
-                    </div>
-                </div>
-
-                {/* Schedule Status */}
-                <fieldset className='mb-4'>
-                    <legend className="mb-2 block text-sm font-medium">
-                        Set schedule status
-                    </legend>
-                    <div className="rounded-md border border-gray-200 bg-white px-[14px] py-3">
-                        <div className="flex flex-wrap gap-4">
-                            <div className="flex items-center">
-                                <input
-                                    id="status"
-                                    name="status"
-                                    type="radio"
-                                    defaultChecked={schedule?.status === "active"}
-                                    value="active"
-                                    className="h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-2"
-                                    aria-describedby="status-error"
-                                />
-                                <label
-                                    htmlFor="status"
-                                    className="ml-2 flex cursor-pointer items-center gap-1.5 rounded-md bg-brand-lime px-3 py-1.5 text-xs font-bold text-brand-navy"
-                                >
-                                    active <CheckIcon className="h-4 w-4" />
+                {scheduleType === "recurring" && (
+                    <fieldset className="mt-5">
+                        <legend className="mb-2 text-sm font-medium">Days</legend>
+                        <div className="flex flex-wrap gap-2 rounded-md border border-slate-200 bg-white p-3">
+                            {DAYS.map(([value, label]) => (
+                                <label key={value} className="flex cursor-pointer items-center gap-2 rounded-md border border-slate-200 px-3 py-2 text-sm">
+                                    <input name="days" type="checkbox" value={value} defaultChecked={schedule?.days.includes(value)} className="h-4 w-4 accent-blue-600" /> {label}
                                 </label>
-                            </div>
-                            <div className="flex items-center">
-                                <input
-                                    id="status"
-                                    name="status"
-                                    type="radio"
-                                    defaultChecked={schedule?.status === "inactive"}
-                                    value="inactive"
-                                    className="h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-2"
-                                    aria-describedby="status-error"
-                                />
-                                <label
-                                    htmlFor="status"
-                                    className="ml-2 flex cursor-pointer items-center gap-1.5 rounded-md bg-slate-300 px-3 py-1.5 text-xs font-bold text-slate-700"
-                                >
-                                    inactive <XMarkIcon className="h-4 w-4" />
-                                </label>
-                            </div>
+                            ))}
                         </div>
-                    </div>
-                </fieldset>
-
-                {/* Days */}
-                <fieldset className='mb-4'>
-                    <legend className="mb-2 block text-sm font-medium">
-                        Days
-                    </legend>
-                    <div className="rounded-md border border-gray-200 bg-white px-[14px] py-3">
-                        <div className="flex flex-wrap gap-4">
-                            {
-                                days.map(item => (
-                                    <div key={item} className="flex items-center gap-2">
-                                        <label
-                                            htmlFor={item}
-                                            className="flex cursor-pointer items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-bold text-white"
-                                        >
-                                            {item}
-                                        </label>
-                                        <input
-                                            id={item}
-                                            name="days"
-                                            type="checkbox"
-                                            defaultChecked={schedule?.days.includes(item)}
-                                            value={item}
-                                            className="h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-2"
-                                            aria-describedby="days-error"
-                                        />
-                                    </div>
-                                ))
-                            }
-                        </div>
-                    </div>
-                </fieldset>
+                    </fieldset>
+                )}
             </div>
-            <div className="mt-6 flex justify-center md:justify-end gap-4">
-                <Link
-                    href="/dashboard/schedule"
-                    className="brand-action-secondary"
-                >
-                    Cancel
-                </Link>
-                <button
-                    className="brand-action"
-                    onClick={() => setLoading(true)}
-                >
-                    <span>{schedule ? "Update Schedule" : "Create Schedule"}</span>
+
+            <div className="mt-6 flex justify-center gap-4 md:justify-end">
+                <Link href="/dashboard/schedule" className="brand-action-secondary">Cancel</Link>
+                <button type="submit" disabled={loading || devicesLoading || !devices.length} className="brand-action disabled:cursor-not-allowed disabled:opacity-60">
+                    {loading ? "Saving..." : schedule ? "Update Schedule" : "Create Schedule"}
                 </button>
-                {
-                    loading ? <div className='self-center'><Loading small /></div> : null
-                }
             </div>
         </form>
-    )
+    );
+}
+
+function RadioField({ legend, name, values, selected }: { legend: string; name: string; values: readonly string[]; selected: string }) {
+    return <fieldset><legend className="mb-2 text-sm font-medium">{legend}</legend><div className="flex h-[42px] items-center gap-5 rounded-md border border-slate-200 bg-white px-3 text-sm">{values.map(value => <label key={value} className="flex cursor-pointer items-center gap-2 capitalize"><input name={name} type="radio" value={value} defaultChecked={selected === value} className="accent-blue-600" />{value}</label>)}</div></fieldset>;
+}
+
+function DateTimeField({ label, name, type, value, icon, inputClass }: { label: string; name: string; type: "date" | "time"; value: string; icon: "date" | "time"; inputClass: string }) {
+    const Icon = icon === "date" ? CalendarIcon : ClockIcon;
+    return <label className="block text-sm font-medium"><span className="mb-2 block">{label}</span><span className="relative block"><input name={name} type={type} required defaultValue={value} className={`${inputClass} pl-10`} /><Icon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-slate-500" /></span></label>;
 }

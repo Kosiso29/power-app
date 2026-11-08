@@ -1,60 +1,48 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 'use client'
 
-import { useState, useEffect } from "react";
-import Link from 'next/link';
-import {
-    CheckIcon,
-    ClockIcon,
-    UserCircleIcon,
-    CalendarIcon,
-    XMarkIcon,
-    ArrowPathRoundedSquareIcon,
-    ArrowUturnDownIcon
-} from '@heroicons/react/24/outline';
-import { toast } from 'react-toastify';
+import { useEffect, useState } from "react";
+import { ArrowPathIcon, ExclamationTriangleIcon } from "@heroicons/react/24/outline";
+import Form, { type Schedule } from "@/app/components/form";
 import Loading from "@/app/components/loading";
-import Form from "@/app/components/form";
-import axios from "axios";
-import 'react-toastify/dist/ReactToastify.css';
-import { getAuthIdToken } from "@/app/utils/authSession";
 
 export default function Page({ params }: { params: { id: string } }) {
-    const [schedule, setSchedule] = useState(null);
-
-
-    const getData = async (idToken: string) => {
-        const [deviceId, scheduleId] = params.id.split("-");
-        await new Promise((resolve, reject) => {
-            axios.get(`https://5jl4i1e6j7.execute-api.eu-west-3.amazonaws.com/dev/schedules/${scheduleId}?device_id=${deviceId}`, {
-                headers: {
-                    'Authorization': `${idToken}`
-                }
-            })
-                .then(response => response.data)
-                .then(data => {
-                    setSchedule(data);
-                    resolve(data);
-                })
-                .catch(() => reject());
-        })
-    }
+    const [schedule, setSchedule] = useState<Schedule | null>(null);
+    const [error, setError] = useState("");
+    const [requestKey, setRequestKey] = useState(0);
 
     useEffect(() => {
-        const idToken = getAuthIdToken();
+        let active = true;
+        setError("");
+        setSchedule(null);
 
-        if (idToken) {
-            getData(idToken);
-        }
-    }, [params.id]);
+        fetch(`/api/schedules/${encodeURIComponent(params.id)}`, { cache: "no-store" })
+            .then(async response => {
+                const body = await response.json().catch(() => ({}));
+                if (!response.ok) throw new Error(body.message || body.error || "Unable to load this schedule.");
+                const item = body.schedule || body.item || body.items?.[0] || body;
+                return {
+                    ...item,
+                    relay_numbers: Array.isArray(item.relay_numbers)
+                        ? item.relay_numbers.map(Number).filter(Number.isFinite)
+                        : [],
+                    days: Array.isArray(item.days) ? item.days : [],
+                };
+            })
+            .then(item => active && setSchedule(item))
+            .catch(reason => active && setError(reason instanceof Error ? reason.message : "Unable to load this schedule."));
+
+        return () => { active = false; };
+    }, [params.id, requestKey]);
 
     return (
         <div className="mx-auto max-w-4xl">
             <p className="text-xs font-black uppercase text-brand-cyan">Automation</p>
-            <h1 className='mt-2 text-3xl font-black text-brand-navy sm:text-4xl'>Edit schedule</h1>
+            <h1 className="mt-2 text-3xl font-black text-brand-navy sm:text-4xl">Edit schedule</h1>
             <p className="mt-2 text-sm text-slate-500">Update this relay routine.</p>
-            <div className='brand-panel mt-8 h-auto w-full px-3 py-8 md:p-8'>
-                { schedule ? <Form schedule={schedule} /> : <div><Loading /></div>}
+            <div className="brand-panel mt-8 h-auto w-full px-3 py-8 md:p-8">
+                {schedule && <Form schedule={schedule} />}
+                {!schedule && !error && <div className="flex min-h-56 items-center justify-center"><Loading /></div>}
+                {error && <div className="flex min-h-56 flex-col items-center justify-center text-center"><ExclamationTriangleIcon className="h-9 w-9 text-rose-400" /><h2 className="mt-4 font-bold text-brand-navy">Unable to load schedule</h2><p className="mt-2 text-sm text-slate-400">{error}</p><button type="button" className="brand-action mt-5" onClick={() => setRequestKey(key => key + 1)}><ArrowPathIcon className="h-4 w-4" />Try again</button></div>}
             </div>
         </div>
     );
