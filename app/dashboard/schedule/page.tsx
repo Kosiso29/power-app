@@ -1,78 +1,62 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-// @ts-nocheck
 'use client'
 
 import { PlusIcon } from "@heroicons/react/24/solid";
 import { ArrowPathIcon, CalendarDaysIcon, ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
-import PrimaryButton from "../../ui/button";
 import Table from "../../components/table";
 import Search from "../../components/search";
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { useDispatch } from "react-redux";
 import { schedulesActions } from "@/app/store/schedules";
-import { useSelector } from "react-redux";
-import { getAuthIdToken } from "@/app/utils/authSession";
 import Loading from "../../components/loading";
+import type { Schedule as ScheduleItem } from "@/app/components/form";
 
 export default function Schedule() {
-    const [schedules, setSchedules] = useState([]);
+    const [schedules, setSchedules] = useState<ScheduleItem[]>([]);
     const [requestStatus, setRequestStatus] = useState("loading");
     const [errorMessage, setErrorMessage] = useState("");
     const [requestKey, setRequestKey] = useState(0);
-    const deviceId = useSelector(state => state.authReducer.deviceId);
     const dispatch = useDispatch();
 
-    const getData = async (idToken) => {
-        const response = await axios.get(`https://5jl4i1e6j7.execute-api.eu-west-3.amazonaws.com/dev/${deviceId}?sort_key=`, {
-            headers: {
-                'Authorization': `${idToken}`
-            },
-            timeout: 15000,
-        });
+    const getData = async () => {
+        const controller = new AbortController();
+        const timeout = window.setTimeout(() => controller.abort(), 15000);
+        const response = await fetch("/api/schedules", { cache: "no-store", signal: controller.signal });
+        window.clearTimeout(timeout);
+        const body = await response.json().catch(() => ({}));
 
-        if (!Array.isArray(response.data)) {
+        if (!response.ok) throw new Error(body.message || body.error || "Schedules could not be loaded.");
+        const items = Array.isArray(body) ? body : body.schedules || body.items;
+        if (!Array.isArray(items)) {
             throw new Error("The schedules service returned an unexpected response.");
         }
-
-        setSchedules(response.data);
+        setSchedules(items.map(item => ({
+            ...item,
+            relay_numbers: Array.isArray(item.relay_numbers)
+                ? item.relay_numbers.map(Number).filter(Number.isFinite)
+                : [],
+            days: Array.isArray(item.days) ? item.days : [],
+        })));
     }
     useEffect(() => {
         dispatch(schedulesActions.updateSchedules(schedules));
     }, [schedules, dispatch])
 
     useEffect(() => {
-        const idToken = getAuthIdToken();
-
-        if (!idToken) {
-            setRequestStatus("error");
-            setErrorMessage("Your session is unavailable. Please sign in again.");
-            return;
-        }
-
-        if (!deviceId) {
-            const deviceTimer = window.setTimeout(() => {
-                setRequestStatus("error");
-                setErrorMessage("Your device could not be identified. Refresh the page and try again.");
-            }, 8000);
-
-            return () => window.clearTimeout(deviceTimer);
-        }
-
         setRequestStatus("loading");
         setErrorMessage("");
-        getData(idToken)
+        getData()
             .then(() => setRequestStatus("success"))
             .catch((error) => {
                 setRequestStatus("error");
                 setErrorMessage(
-                    error?.code === "ECONNABORTED"
+                    error instanceof DOMException && error.name === "AbortError"
                         ? "The schedules service took too long to respond."
                         : error?.message || "Schedules could not be loaded."
                 );
             });
-    }, [deviceId, requestKey]);
+    }, [requestKey]);
 
     return (
         <div className="mx-auto max-w-[1440px]">
